@@ -9,32 +9,114 @@ Initialization of the facade pattern for communication between layers. Implement
 ---
 
 ## **Structure Directory and file:**
+
 ### Directory:
+
 * **hbnb/** : root directory
+
 * **app/** : directory contains the core application code.
+
 * **app/api/** : subdirectory houses the API endpoints, organized by version (v1/).
+
 * **app/models/** : subdirectory contains the business logic classes (e.g., user.py, place.py).
+
 * **app/services/** : subdirectory is where the Facade pattern is implemented, managing the interaction between layers.
+
 * **app/persistence/** : subdirectory is where the in-memory repository is implemented.
 
 ### File:
+
 * **run.py** : is the entry point for running the Flask application.
+
 * **config.py** : will be used for configuring environment variables and application settings.
+
 * **requirements.txt** : will list all the Python packages needed for the project.
 
 ---
+
+## **Business Logic Layer:**
+### Description:
+
+This layer contains the main entities of the system.
+Each class validates its own data.
+The relationship between entities are defined here.
+The layer is independent of the API.
+
+#### Class descriptions:
+
+* **BaseModel:**
+
+Centralises common attributes.
+Uses UUID to guarantee uniqueness.
+Automatically manages timestamps.
+Avoids code duplication.(DRY, "Don't Repeat Yourself")
+* **User:**
+
+Represents a user of the system.
+Validates the data format.
+email uniqueness handled by the Facade.
+can own multple Places.
+Can write multiple Reviews.
+* **Review:**
+
+Represents an available property.
+Validates geographical coordinates.
+Ensures that the owner is a valid user.
+May contain multiple reviews.
+May be associeted with multiple amenities.
+* **Place:**
+
+Represents a review of a Place.
+Associates a User with a Place.
+Guarantee a valid rating (1-5).
+* **Amenity:**
+
+Represents a feature of a property.
+E.g: Wi-Fi, Parking.
+Can be associated with several Places.
+
+---
+## **Models and Relationships:**
+**1. User (1) ────< Place (N):**
+* A user may own multiple places.
+* A place has only one user (owner).
+* One-to-many.
+
+**2. Place (1) ────< Review (N):**
+* A Place can have multiple Reviews.
+* A Review belongs to only one Place.
+* One-to-many.
+
+**3.User (1) ────< Review (N):**
+* A user can write multiple reviews.
+* A review is written by a single user.
+* One-to-many.
+
+**4.Place (N) ────< Amenity (N):**
+* A Place can have multiple Amenities.
+* An Amenity can belong to multiple Places.
+* Many-to-many.
+---
 ## **Installation:**
+
 ### Installing dependencies using:
+
 * **"pip install -r requirements.txt"**
 ---
+
 ## **Running the Application:**
+
 ### Start the application with:
 * **"python run.py"**
 
 ### The application will run on:
+
 * **http://127.0.0.1:5000/**
+
 ---
 ## **Authors:**
+
 ### Team:
+
 * Mila **AUDU**: https://github.com/Milaa-au
 * Pawnee **DEFIZE**: https://github.com/Pawnee33
