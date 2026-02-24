@@ -68,8 +68,11 @@ class Amenity(BaseModel):
             return amenity
 
         def get_amenity(self, amenity_id):
-            # Placeholder for logic to retrieve an amenity by ID
-            pass
+            if not amenity_id or not isinstance(amenity_id, int):
+                raise ValueError("Invalid amenity id")
+            if amenity_id not in self.amenities:
+                raise ValueError("Amenity not found")
+            return self.amenities[amenity_id]
 
         def get_all_amenities(self):
             # Placeholder for logic to retrieve all amenities
