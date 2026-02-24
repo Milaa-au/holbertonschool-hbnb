@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from app.models.base_model import BaseModel
 
 class Amenity(BaseModel):
@@ -38,3 +40,41 @@ class Amenity(BaseModel):
             raise ValueError("Name must be 50 characters or less")
 
         self.name = name
+
+        def create_amenity(self, amenity_data):
+            """
+            Creates a new Amenity instance after
+            validating the data provided.
+
+            This method checks that the
+            data entered is valid and contains the
+            required fields before creating
+            a new Amenity object. If the data
+            is invalid or if required information
+            is missing, a ValueError error is raised.
+
+            Once validated, the Amenity instance
+            is instantiated and stored in the
+            internal amenities collection, then returned.
+            """
+
+            if not amenity_data or not isinstance(amenity_data, dict):
+                raise ValueError("Invalid amenity data")
+            if "name" not in amenity_data or not amenity_data["name"]:
+                raise ValueError("Amenity name is required")
+            
+            amenity = Amenity(**amenity_data)
+            self.amenities[amenity.id] = amenity
+            return amenity
+
+        def get_amenity(self, amenity_id):
+            # Placeholder for logic to retrieve an amenity by ID
+            pass
+
+        def get_all_amenities(self):
+            # Placeholder for logic to retrieve all amenities
+            pass
+
+        def update_amenity(self, amenity_id, amenity_data):
+            # Placeholder for logic to update an amenity
+            pass
