@@ -1,3 +1,12 @@
+"""
+User API namespace.
+
+This module defines REST endpoints for managing users, including
+creation, retrieval, and update operations. It relies on a facade
+service layer to handle business logic and data persistence.
+"""
+
+
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 
@@ -12,12 +21,28 @@ user_model = api.model('User', {
 
 @api.route('/')
 class UserList(Resource):
+    """
+    Resource for operations on the user collection.
+
+    Provides endpoints to create a new user and to retrieve
+    the list of all users.
+    """
+
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user"""
+        """
+        Create a new user.
+
+        Validates input data against the user model, checks
+        that the email is unique, and creates the user via
+        the service facade.
+
+        Returns:
+            tuple: JSON representation of the created user and HTTP status code.
+        """
         user_data = api.payload
 
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
@@ -30,6 +55,15 @@ class UserList(Resource):
 
     @api.response(200, 'User details retrieved successfully')
     def get(self):
+        """
+        Retrieve all users.
+
+        Fetches the complete list of users from the service
+        layer and returns them as a JSON array.
+
+        Returns:
+            tuple: List of users and HTTP status code.
+        """
         users = facade.get_all_users()
         List_user = []
         for user in users:
@@ -44,10 +78,24 @@ class UserList(Resource):
 
 @api.route('/<user_id>')
 class UserResource(Resource):
+    """
+    Resource for operations on a single user.
+
+    Provides endpoints to retrieve and update a user
+    identified by their unique ID.
+    """
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID"""
+        """
+        Retrieve a user by ID.
+
+        Args:
+            user_id (str): Unique identifier of the user.
+
+        Returns:
+            tuple: User data if found, otherwise an error message and status code.
+        """
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -57,6 +105,18 @@ class UserResource(Resource):
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
     def put(self, user_id):
+        """
+        Update an existing user.
+
+        Validates the input payload and updates the user
+        through the service facade.
+
+        Args:
+            user_id (str): Unique identifier of the user.
+
+        Returns:
+            tuple: Updated user data if successful, otherwise an error message.
+        """
         data_user = api.payload
         update_user = facade.update_user(user_id, data_user)
         if not update_user:

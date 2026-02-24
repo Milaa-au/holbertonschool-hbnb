@@ -1,7 +1,14 @@
+"""Facade is an intermediary between the API layer and
+the persistance layer.
+"""
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 
 class HBnBFacade:
+    """HBnBFacade acts as an intermediary between the API layer and the
+        persistence layer. It centralizes business logic and abstracts
+        direct access to the repositories.
+    """
     def __init__(self):
         self.user_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
@@ -10,17 +17,21 @@ class HBnBFacade:
 
     # Placeholder method for creating a user
     def create_user(self, user_data):
+        """create_user that create user"""
         user = User(**user_data)
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
+        """get_user that retrieved an user"""
         return self.user_repo.get(user_id)
 
     def get_all_users(self):
+        """get_all_users that retrieved all users"""
         return self.user_repo.get_all()
 
     def update_user(self, user_id, user_data):
+        """ update_user that update an user"""
         user = self.get_user(user_id)
         if not user:
             return None
@@ -28,7 +39,9 @@ class HBnBFacade:
         return self.get_user(user_id)
 
     def get_user_by_email(self, email):
+        """get_user_by_email that retrieved an user via an email"""
         return self.user_repo.get_by_attribute('email', email)
 
     def get_place(self, place_id):
+        """get_place that retrieved place"""
         return self.place_repo.get(place_id)
