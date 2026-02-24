@@ -3,6 +3,7 @@ the persistance layer.
 """
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
+from app.models.place import Place
 
 class HBnBFacade:
     """HBnBFacade acts as an intermediary between the API layer and the
@@ -45,3 +46,39 @@ class HBnBFacade:
     def get_place(self, place_id):
         """get_place that retrieved place"""
         return self.place_repo.get(place_id)
+
+
+    def create_place(self, place_data):
+        owner_id = place_data["owner_id"]
+        owner = self.get_user(owner_id)
+        if not owner:
+            raise ValueError(("Owner not found"))
+
+        place = Place(
+            place_data["title"],
+            place_data["description"],
+            place_data["price"],
+            place_data["latitude"],
+            place_data["longitude"],
+            owner
+        )
+
+        amenities_ids = place_data["amenities"]
+        for amenity_id in amenities_ids:
+            amenity = self.amenity_repo.get(amenity_id)
+
+            if not amenity:
+                raise ValueError(("Amenity not found"))
+
+            place.add_amenity(amenity)
+
+        self.place_repo.add(place)
+        return place
+
+    def get_all_places(self):
+        # Placeholder for logic to retrieve all places
+        pass
+
+    def update_place(self, place_id, place_data):
+        # Placeholder for logic to update a place
+        pass
