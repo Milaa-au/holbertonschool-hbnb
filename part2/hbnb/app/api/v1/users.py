@@ -30,7 +30,7 @@ class UserList(Resource):
 
     @api.response(200, 'User details retrieved successfully')
     def get(self):
-        users = facade.user_repo.get_all()
+        users = facade.get_all_users()
         List_user = []
         for user in users:
             List_user.append({
@@ -57,19 +57,14 @@ class UserResource(Resource):
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
     def put(self, user_id):
-        user = facade.get_user(user_id)
-        if not user:
+        data_user = api.payload
+        update_user = facade.update_user(user_id, data_user)
+        if not update_user:
             return {'error': 'User not found'}, 404
 
-        data_user = api.payload
-        user.first_name = data_user['first_name']
-        user.last_name = data_user['last_name']
-        user.email = data_user['email']
-        facade.user_repo.update(user)
-
         return {
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email
+            'id': update_user.id,
+            'first_name': update_user.first_name,
+            'last_name': update_user.last_name,
+            'email': update_user.email
         }, 200
