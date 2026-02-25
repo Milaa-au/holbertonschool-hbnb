@@ -114,6 +114,55 @@ Can be associated with several Places.
 * **http://127.0.0.1:5000/**
 
 ---
+## **Testing the API with curl:**
+### **1.Create a User:**
+* curl -X POST http://127.0.0.1:5000/api/v1/users/ \
+-H "Content-Type: application/json" \
+-d '{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com"
+}'
+
+### **2.Create a Place:**
+* curl -X POST http://127.0.0.1:5000/api/v1/places/ \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Cozy Apartment",
+  "description": "Nice place to stay",
+  "price": 100.0,
+  "latitude": 48.8566,
+  "longitude": 2.3522,
+  "owner_id": "USER_ID",
+  "amenities": []
+}'
+
+### **3.Get all Places:**
+* curl http://127.0.0.1:5000/api/v1/places/
+
+### **4.Get place by ID:**
+* curl http://127.0.0.1:5000/api/v1/places/PLACE_ID
+
+### **5.Update a Place:**
+* curl -X PUT http://127.0.0.1:5000/api/v1/places/PLACE_ID \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Luxury Condo",
+  "price": 250.0
+}'
+
+### **6.Error Handling Example:**
+* curl -X POST http://127.0.0.1:5000/api/v1/places/ \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Test",
+  "price": 100,
+  "latitude": 40,
+  "longitude": 2,
+  "owner_id": "INVALID_ID",
+  "amenities": []
+}'
+---
 ## **Authors:**
 
 ### Team:
