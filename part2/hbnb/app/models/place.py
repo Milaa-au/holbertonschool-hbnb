@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Place model.
 
@@ -9,7 +10,6 @@ ownership, and relationships with reviews and amenities.
 
 from app.models.base_model import BaseModel
 from app.models.user import User
-from app.models.review import Review
 from app.models.amenity import Amenity
 
 
@@ -84,6 +84,8 @@ class Place(BaseModel):
         Raises:
             ValueError: If review is not a valid Review instance.
         """
+        from app.models.review import Review
+
         if not isinstance(review, Review):
             raise ValueError("review must be a Review instance")
         self.reviews.append(review)
