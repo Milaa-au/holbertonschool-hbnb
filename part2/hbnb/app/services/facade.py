@@ -5,6 +5,7 @@ from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.place import Place
 
+
 class HBnBFacade:
     """HBnBFacade acts as an intermediary between the API layer and the
         persistence layer. It centralizes business logic and abstracts
@@ -32,7 +33,7 @@ class HBnBFacade:
         return self.user_repo.get_all()
 
     def update_user(self, user_id, user_data):
-        """ update_user that update an user"""
+        """update_user that update an user"""
         user = self.get_user(user_id)
         if not user:
             return None
@@ -43,12 +44,8 @@ class HBnBFacade:
         """get_user_by_email that retrieved an user via an email"""
         return self.user_repo.get_by_attribute('email', email)
 
-    def get_place(self, place_id):
-        """get_place that retrieved place"""
-        return self.place_repo.get(place_id)
-
-
     def create_place(self, place_data):
+        """create_place that create place"""
         owner_id = place_data["owner_id"]
         owner = self.get_user(owner_id)
         if not owner:
@@ -75,10 +72,23 @@ class HBnBFacade:
         self.place_repo.add(place)
         return place
 
+    def get_place(self, place_id):
+        """get_place that retrieved place"""
+        return self.place_repo.get(place_id)
+
     def get_all_places(self):
-        # Placeholder for logic to retrieve all places
-        pass
+        """get_all_places that retrieved all places"""
+        return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        # Placeholder for logic to update a place
-        pass
+        """update_place that update a place"""
+        place = self.get_place(place_id)
+        if not place:
+            return None
+        if "owner_id" in place_data:
+            raise ValueError("Owner cannot be modified")
+        if "amenities" in place_data:
+            raise ValueError("Amenities connot be modified")
+
+        self.place_repo.update(place_id, place_data)
+        return self.get_place(place_id)
