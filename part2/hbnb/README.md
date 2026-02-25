@@ -97,6 +97,59 @@ Can be associated with several Places.
 * An Amenity can belong to multiple Places.
 * Many-to-many.
 ---
+## **API / V1:**
+### Description:
+The API layer represents the Presentation Layer of the application.
+It exposes RESTful endpoints using Flask-RESTX and handles:
+
+* HTTP requests and responses.
+* Input validation.
+* JSON serialization.
+* Status codes (200, 201, 400, 404).
+* Error handling.
+
+The API does not contain business logic.
+
+It communicates with the Business Logic layer exclusively through the Facade.
+
+All endpoints are versioned under:
+* **/api/v1/**
+---
+## **Facade:**
+### Description:
+### The HBnBFacade acts as an intermediary between:
+* The API layer.
+* The Business Logic layer.
+* The Persistence layer.
+### It centralizes application logic and ensures:
+* Validation of relationships between entities.
+* Coordination between repositories.
+* Data integrity.
+* Separation of concerns.
+
+The Facade prevents the API from directly accessing repositories or models, improving maintainability and scalability.
+
+### It implements operations such as:
+* Creating users and places.
+* Retrieving data.
+* Updating entities.
+* Validating ownership and relationships.
+---
+## **Repository:**
+### Description:
+The Repository layer handles data storage and retrieval.
+### The project currently uses an InMemoryRepository, which:
+* Stores objects in a Python dictionary.
+* Provides CRUD operations (Create, Read, Update, Delete).
+* Abstracts data access from business logic.
+
+This abstraction allows the storage mechanism to be replaced later (e.g., database integration) without modifying the Business Logic layer.
+
+### The Repository ensures:
+* Encapsulation of data access.
+* Reusability.
+* Clean separation between logic and persistence.
+---
 ## **Installation:**
 
 ### Installing dependencies using:
