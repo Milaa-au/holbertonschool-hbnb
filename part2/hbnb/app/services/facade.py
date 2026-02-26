@@ -17,7 +17,6 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-
     def create_user(self, user_data):
         """create_user that create user"""
         user = User(**user_data)
