@@ -62,5 +62,15 @@ class TestPlaceEndpoints(unittest.TestCase):
         data = response.get_json()
         self.assertIn("error", data)
 
+    def test_create_place_latitude_invalid(self):
+        """Test creating a place with an invalid latitude data."""
+        owner_id = self.create_test_user()
+
+        response = self.client.post('/api/v1/places/', json={
+            "latidude": 100
+        })
+
+        self.assertEqual(response.status_code, 400)
+
 if __name__ == '__main__':
     unittest.main()
