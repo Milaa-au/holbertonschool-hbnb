@@ -47,8 +47,6 @@ class TestPlaceEndpoints(unittest.TestCase):
     def test_create_place_invalid(self):
         """Test creating a place with invalid data."""
 
-        owner_id = self.create_test_user()
-
         response = self.client.post('/api/v1/places/', json={
             "title": "Test Place",
             "description": "Nice place",
