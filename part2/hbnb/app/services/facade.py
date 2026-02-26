@@ -84,10 +84,9 @@ class HBnBFacade:
         place = self.get_place(place_id)
         if not place:
             return None
-        if "owner_id" in place_data:
-            raise ValueError("Owner cannot be modified")
-        if "amenities" in place_data:
-            raise ValueError("Amenities connot be modified")
+
+        place_data.pop("owner_id", None)
+        place_data.pop("amenities", None)
 
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
