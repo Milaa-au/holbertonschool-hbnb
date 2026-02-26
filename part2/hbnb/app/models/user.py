@@ -8,6 +8,7 @@ represents an application user with validation rules for core fields.
 
 
 from app.models.base_model import BaseModel
+import re
 
 
 class User(BaseModel):
@@ -51,7 +52,9 @@ class User(BaseModel):
 
         if not email:
             raise ValueError("Email is required")
-        if "@" not in email or "." not in email:
+        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+        if not re.match(pattern, email):
             raise ValueError("Invalid email format")
         self.email = email
 
