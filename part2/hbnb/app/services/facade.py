@@ -122,24 +122,49 @@ class HBnBFacade:
 
             return review
 
-        def get_amenity(self, amenity_id):
-
         def get_review(self, review_id):
-            # Placeholder for logic to retrieve a review by ID
-            pass
+            if not review_id or not isinstance(review_id, int):
+                raise ValueError("Invalid review id")
+            if review_id not in self.reviews:
+                raise ValueError("Review not found")
+            return self.reviews[review_id]
 
         def get_all_reviews(self):
-            # Placeholder for logic to retrieve all reviews
-            pass
+            return Review.query.all()
 
         def get_reviews_by_place(self, place_id):
-            # Placeholder for logic to retrieve all reviews for a specific place
-            pass
+            if not place_id or not isinstance(place_id, str):
+                raise ValueError("Invalid place id")
+            if place_id not in self.places:
+                raise ValueError("Place not found")
+            filter_review = []
+            for review in self.reviews.values():
+                if review.place_id == place_id:
+                    filet_review.append(review)
+            return filter_review
 
         def update_review(self, review_id, review_data):
-            # Placeholder for logic to update a review
-            pass
+            review = Review.query.get(review_id)
+    
+            if not review:
+                raise ValueError("Review not found")
+
+            allowed_modif = ['text']
+
+            for key, value in review_data.items():
+                if key in allowed_modif:
+                    setattr(review, key, value)
+            
+            review.updated_at = datetime.utcnow()
+            db.session.commit()
+            return review
 
         def delete_review(self, review_id):
-            # Placeholder for logic to delete a review
-            pass
+            review = Review.query.get(review_id)
+            if not review:
+                raise ValueError("Review not found")
+            
+            db.session.delete(review)
+            db.session.commit()
+
+            return True
