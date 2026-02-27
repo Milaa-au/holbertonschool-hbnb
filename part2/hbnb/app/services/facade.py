@@ -175,10 +175,10 @@ class HBnBFacade:
         amenity = Amenity.query.get(amenity_id)
     
         if not amenity:
-        raise ValueError("Amenity not found")
+            raise ValueError("Amenity not found")
 
         for key, value in amenity_data.items():
-        setattr(amenity, key, value)
+            setattr(amenity, key, value)
 
         db.session.commit()
         return amenity
@@ -233,7 +233,7 @@ class HBnBFacade:
         place = self.places[place_id]
         place.reviews.append(review)
 
-            return review
+        return review
 
     def get_review(self, review_id):
         """
