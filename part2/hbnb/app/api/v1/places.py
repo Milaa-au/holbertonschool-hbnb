@@ -76,7 +76,18 @@ class PlaceList(Resource):
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new place"""
+        """
+        Register a new place.
+
+        Retrieves the JSON payload from the API request and attempts to create
+        a new place using the facade. If creation fails due to invalid data,
+        returns a 400 response with an error message.
+
+        Returns:
+        tuple: A JSON dictionary containing the new place details and
+        the HTTP status code 201 if successful, or an error message and
+        status code 400 if creation fails.
+        """
         place_data = api.payload
 
         try:
@@ -95,7 +106,16 @@ class PlaceList(Resource):
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
-        """Retrieve a list of all places"""
+        """
+        Retrieve the list of all locations.
+
+        Retrieves all locations via the facade and returns a simplified list
+        containing the ID, title, latitude, and longitude of each location.
+
+        Returns:
+        tuple: A list of dictionaries representing each location and
+        the HTTP 200 code.
+        """
         places = facade.get_all_places()
         List_places = []
         for place in places:
@@ -113,7 +133,19 @@ class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
-        """Get place details by ID"""
+        """
+        Retrieve details of a place by its ID.
+
+        Retrieves a specific place via its ID. If the place does not exist,
+        returns a 404 error with an appropriate message.
+
+        Args:
+        place_id (str): The unique identifier of the place to retrieve.
+
+        Returns:
+        tuple: A dictionary containing detailed information
+        about the place and HTTP code 200 if found, or an error message
+        with code 404 if not found."""
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
@@ -144,7 +176,21 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
-        """Update a place's information"""
+        """
+        Update place information.
+
+        Accepts JSON data from the request and attempts to update
+        an existing place identified by place_id. If the data is invalid,
+        returns a 400 response. If the place does not exist, returns a 404 response.
+
+        Args:
+        place_id (str): The unique identifier of the place to update.
+
+        Returns:
+        tuple: A dictionary containing the updated information
+        for the place and HTTP code 200 if successful, or an error message
+        with code 400 or 404 if unsuccessful.
+        """
         place_data = api.payload
 
         try:
