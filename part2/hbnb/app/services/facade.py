@@ -113,3 +113,232 @@ class HBnBFacade:
 
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
+
+    def create_amenity(self, amenity_data):
+        """
+        Creates a new Amenity instance after
+        validating the data provided.
+
+        This method checks that the
+        data entered is valid and contains the
+        required fields before creating
+        a new Amenity object. If the data
+        is invalid or if required information
+        is missing, a ValueError error is raised.
+
+        Once validated, the Amenity instance
+        is instantiated and stored in the
+        internal amenities collection, then returned.
+        """
+
+        if not amenity_data or not isinstance(amenity_data, dict):
+            raise ValueError("Invalid amenity data")
+        if "name" not in amenity_data or not amenity_data["name"]:
+            raise ValueError("Amenity name is required")
+            
+        amenity = Amenity(**amenity_data)
+        self.amenities[amenity.id] = amenity
+        return amenity
+
+    def get_amenity(self, amenity_id):
+
+        """
+        Retrieves a commodity from its identifier.
+
+        Verifies that the identifier is valid and exists in
+        memory storage before returning the corresponding object.
+        """
+
+        if not amenity_id or not isinstance(amenity_id, int):
+            raise ValueError("Invalid amenity id")
+        if amenity_id not in self.amenities:
+            raise ValueError("Amenity not found")
+        return self.amenities[amenity_id]
+
+    def get_all_amenities(self):
+        """
+        Retrieves all amenities stored in the database.
+
+        Performs a query to return all
+        Amenity objects present in the database.
+        """
+        return Amenity.query.all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        """
+        Updates an existing convenience.
+
+        Searches for the convenience by its identifier, updates its
+        attributes with the provided data, then saves the
+        changes to the database.
+        """
+        amenity = Amenity.query.get(amenity_id)
+    
+        if not amenity:
+        raise ValueError("Amenity not found")
+
+        for key, value in amenity_data.items():
+        setattr(amenity, key, value)
+
+        db.session.commit()
+        return amenity
+
+    def create_review(self, review_data):
+        """
+        Create a new review after validating the data.
+
+        This method validates the data provided, verifies
+        the existence of the associated user and location,
+        then creates and saves a new review.
+
+        Args:
+        review_data (dict): Review data containing
+            text, rating, user_id, and place_id.
+
+        Returns:
+        Review: Instance of the review created.
+
+        Raises:
+        ValueError: If the data is invalid, if a required field
+        is missing, or if the user or place
+        does not exist.
+        """
+        if not review_data or not isinstance(review_data, dict):
+            raise ValueError("Invalid review data")
+
+        required_fields = ["text", "rating", "user_id", "place_id"]
+        for field in required_fields:
+            if field not in review_data:
+                raise ValueError(f"{field} is required")
+
+        if not review_data["text"].strip():
+            raise ValueError("Review text cannot be empty")
+
+        rating = review_data["rating"]
+        if not isinstance(rating, int) or rating < 1 or rating > 5:
+            raise ValueError("Rating must be an integer between 1 and 5")
+
+        user_id = review_data["user_id"]
+        if user_id not in self.users:
+            raise ValueError("User not found")
+
+        place_id = review_data["place_id"]
+        if place_id not in self.places:
+            raise ValueError("Place not found")
+
+        review = Review(**review_data)
+
+        self.reviews[review.id] = review
+
+        place = self.places[place_id]
+        place.reviews.append(review)
+
+            return review
+
+    def get_review(self, review_id):
+        """
+        Retrieve a review by its ID.
+
+        Args:
+        review_id (int): Unique ID of the review.
+
+        Returns:
+        Review: Instance corresponding to the ID provided.
+
+        Raises:
+        ValueError: If the ID is invalid or if the
+        review does not exist.
+        """
+        if not review_id or not isinstance(review_id, int):
+            raise ValueError("Invalid review id")
+        if review_id not in self.reviews:
+            raise ValueError("Review not found")
+        return self.reviews[review_id]
+
+    def get_all_reviews(self):
+        """
+        Retrieve all saved reviews.
+
+        Returns:
+        list: List of all Review instances.
+        """
+        return Review.query.all()
+
+    def get_reviews_by_place(self, place_id):
+        """
+        Retrieve all reviews associated with a given location.
+
+        Args:
+        place_id (str): Unique identifier for the location.
+
+        Returns:
+        list: List of reviews associated with the location.
+
+        Raises:
+        ValueError: If the location identifier is invalid
+        or if the location does not exist.
+        """
+        if not place_id or not isinstance(place_id, str):
+            raise ValueError("Invalid place id")
+        if place_id not in self.places:
+            raise ValueError("Place not found")
+        filter_review = []
+        for review in self.reviews.values():
+            if review.place_id == place_id:
+                filet_review.append(review)
+        return filter_review
+
+    def update_review(self, review_id, review_data):
+        """
+        Update an existing review.
+
+        This method updates only the authorized fields
+        of a review, then saves the changes to the database.
+    
+
+        Args:
+        review_id (int): Unique identifier of the review.
+        review_data (dict): Data to be modified.
+
+        Returns:
+        Review: Updated instance.
+
+        Raises:
+        ValueError: If the review does not exist.
+        """
+        review = Review.query.get(review_id)
+    
+        if not review:
+            raise ValueError("Review not found")
+
+        allowed_modif = ['text']
+
+        for key, value in review_data.items():
+            if key in allowed_modif:
+                setattr(review, key, value)
+            
+        review.updated_at = datetime.utcnow()
+        db.session.commit()
+        return review
+
+    def delete_review(self, review_id):
+        """
+        Delete an existing review.
+
+        Args:
+        review_id (int): Unique identifier of the review.
+
+        Returns:
+        bool: True if the deletion is successful.
+
+        Raises:
+        ValueError: If the review does not exist.
+        """
+        review = Review.query.get(review_id)
+        if not review:
+            raise ValueError("Review not found")
+            
+        db.session.delete(review)
+        db.session.commit()
+
+        return True
