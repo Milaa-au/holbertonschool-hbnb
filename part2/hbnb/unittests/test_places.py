@@ -333,5 +333,59 @@ class TestPlaceEndpoints(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(data["owner_id"], owner_id)
 
+    def test_create_place_missing_title(self):
+        owner_id = self.create_test_user()
+
+        response = self.client.post(
+            '/api/v1/places/',
+            json={
+                "description": "Nice place",
+                "price": 100,
+                "latitude": 45,
+                "longitude": 3,
+                "owner_id": owner_id,
+                "amenities": []
+            }
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_place_invalid_price_type(self):
+        owner_id = self.create_test_user()
+
+        response = self.client.post(
+            '/api/v1/places/',
+            json=self.create_place_payload(owner_id, price="abc")
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_place_title_too_long(self):
+        owner_id = self.create_test_user()
+        long_title = "A" * 101
+
+        payload = self.create_place_payload(owner_id)
+        payload["title"] = long_title
+
+        response = self.client.post('/api/v1/places/', json=payload)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_place_invalid_price(self):
+        owner_id = self.create_test_user()
+
+        create_response = self.client.post(
+            '/api/v1/places/',
+            json=self.create_place_payload(owner_id)
+        )
+        place_id = create_response.get_json()["id"]
+
+        response = self.client.put(
+            f'/api/v1/places/{place_id}',
+            json=self.create_place_payload(owner_id, price=-10)
+        )
+
+        self.assertEqual(response.status_code, 400)
+
 if __name__ == '__main__':
     unittest.main()

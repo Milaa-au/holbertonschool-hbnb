@@ -101,17 +101,17 @@ class PlaceResource(Resource):
             return {'error': 'Place not found'}, 404
         return {
             'id': place.id,
+            'title': place.title,
+            'description': place.description,
+            'price': place.price,
+            'latitude': place.latitude,
+            'longitude': place.longitude,
             'owner': {
                 'id': place.owner.id,
                 'first_name': place.owner.first_name,
                 'last_name': place.owner.last_name,
                 'email': place.owner.email
             },
-            'title': place.title,
-            'description': place.description,
-            'price': place.price,
-            'latitude': place.latitude,
-            'longitude': place.longitude,
             'amenities': [
                 {
                     'id': amenity.id,

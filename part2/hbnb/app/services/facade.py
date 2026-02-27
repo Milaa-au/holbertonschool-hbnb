@@ -44,28 +44,36 @@ class HBnBFacade:
         return self.user_repo.get_by_attribute('email', email)
 
     def create_place(self, place_data):
-        """create_place that create place"""
-        owner_id = place_data["owner_id"]
+        """Create a new place with validation"""
+
+        try:
+            owner_id = place_data["owner_id"]
+            title = place_data["title"]
+            description = place_data.get("description")
+            price = place_data["price"]
+            latitude = place_data["latitude"]
+            longitude = place_data["longitude"]
+            amenities_ids = place_data.get("amenities", [])
+        except KeyError as e:
+            raise ValueError(f"Missing field: {str(e)}")
+
         owner = self.get_user(owner_id)
         if not owner:
-            raise ValueError(("Owner not found"))
+            raise ValueError("Owner not found")
 
         place = Place(
-            place_data["title"],
-            place_data["description"],
-            place_data["price"],
-            place_data["latitude"],
-            place_data["longitude"],
+            title,
+            description,
+            price,
+            latitude,
+            longitude,
             owner
         )
 
-        amenities_ids = place_data["amenities"]
         for amenity_id in amenities_ids:
             amenity = self.amenity_repo.get(amenity_id)
-
             if not amenity:
-                raise ValueError(("Amenity not found"))
-
+                raise ValueError("Amenity not found")
             place.add_amenity(amenity)
 
         self.place_repo.add(place)
@@ -87,6 +95,21 @@ class HBnBFacade:
 
         place_data.pop("owner_id", None)
         place_data.pop("amenities", None)
+
+        if "price" in place_data and place_data["price"] <= 0:
+            raise ValueError("Price must be greater than 0")
+
+        if "latitude" in place_data:
+            if place_data["latitude"] < -90 or place_data["latitude"] > 90:
+                raise ValueError("Latitude must be between -90 and 90")
+
+        if "longitude" in place_data:
+            if place_data["longitude"] < -180 or place_data["longitude"] > 180:
+                raise ValueError("Longitude must be between -180 and 180")
+
+        if "title" in place_data:
+            if not place_data["title"] or len(place_data["title"]) > 100:
+                raise ValueError("Invalid title")
 
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
