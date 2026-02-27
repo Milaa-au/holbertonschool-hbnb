@@ -1,64 +1,66 @@
 #!/usr/bin/python3
-"""
-Place model.
-
-This module defines the Place entity which represents a property
-listed in the application. It includes location data, pricing,
-ownership, and relationships with reviews and amenities.
-"""
-
 
 from app.models.base_model import BaseModel
-from app.models.user import User
-from app.models.amenity import Amenity
-
 
 class Place(BaseModel):
     """
-    Place domain model.
+    Class representing a place (Place) in the HBnB system.
 
-    Represents a property that can be listed by a user. A place
-    includes descriptive information, geographic coordinates,
-    pricing, an owner, and collections of reviews and amenities.
+    Attributes:
+        - title (str): Title or name of the place (max 100 characters).
+        - description (str): Description of the place.
+        - price (int | float): Price of the place, must be > 0.
+        - latitude (float): Latitude of the place (-90 to 90).
+        - longitude (float): Longitude of the place (-180 to 180).
+        - owner (User): Owner of the place (instance of User).
+        - reviews (list): List of reviews associated with the place.
+        - amenities (list): List of amenities associated with the place.
     """
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
+    def __init__(self, name, description, price, latitude, longitude):
         """
-        Initialize a new Place instance.
+        Initializes a new instance of Place.
 
-        Validates required fields, numeric ranges for coordinates,
-        and ensures the owner is a valid User instance.
-
-        Args:
-            title (str): Name of the place (required, max 100 characters).
-            description (str): Optional description of the place.
-            price (float | int): Price per stay, must be greater than 0.
-            latitude (float | int): Geographic latitude (-90 to 90).
-            longitude (float | int): Geographic longitude (-180 to 180).
-            owner (User): The user who owns the place.
-
-        Raises:
-            ValueError: If any field is missing or invalid.
+        Performs the following validations:
+            - title must be non-empty and <= 100 characters
+            - price must be an int or float and > 0
+            - latitude must be between -90 and 90
+            - longitude must be between -180 and 180
+            - owner must be an instance of User
         """
+
         super().__init__()
+
         if not title:
+
             raise ValueError("Title is required")
+
         if len(title) > 100:
+
             raise ValueError("Title must be 100 characters or less")
+
         self.title = title
 
         self.description = description
 
         if not isinstance(price, (int, float)):
+
             raise ValueError("Price must be an integer or a float")
+
         if price <= 0:
+
             raise ValueError("Price must be greater than 0")
+
         self.price = price
 
         if not isinstance(latitude, (int, float)):
+
             raise ValueError("Latitude must be a number")
+
         if latitude < -90 or latitude > 90:
+
             raise ValueError("Latitude must be between -90 and 90")
+
         self.latitude = latitude
 
         if not isinstance(longitude, (int, float)):
@@ -76,29 +78,27 @@ class Place(BaseModel):
 
     def add_review(self, review):
         """
-        Add a review to the place.
+        Adds a review to the location.
 
         Args:
-            review (Review): Review instance to associate with the place.
+            review (Review): instance of Review to add
 
         Raises:
-            ValueError: If review is not a valid Review instance.
+            ValueError: if the object is not an instance of Review
         """
-        from app.models.review import Review
-
         if not isinstance(review, Review):
             raise ValueError("review must be a Review instance")
         self.reviews.append(review)
 
     def add_amenity(self, amenity):
         """
-        Add an amenity to the place.
+        Adds an amenity to the location.
 
         Args:
-            amenity (Amenity): Amenity instance to associate with the place.
+            amenity (Amenity): instance of Amenity to add
 
         Raises:
-            ValueError: If amenity is not a valid Amenity instance.
+            ValueError: if the object is not an instance of Amenity
         """
         if not isinstance(amenity, Amenity):
             raise ValueError("amenity must be a Amenity instance")
