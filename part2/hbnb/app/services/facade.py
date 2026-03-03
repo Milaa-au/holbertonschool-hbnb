@@ -211,7 +211,7 @@ class HBnBFacade:
             raise ValueError("Amenity name is required")
             
         amenity = Amenity(**amenity_data)
-        self.amenities[amenity.id] = amenity
+        self.ameniti_repo.add(amenity)
         return amenity
 
     def get_amenity(self, amenity_id):
@@ -227,7 +227,7 @@ class HBnBFacade:
             raise ValueError("Invalid amenity id")
         if amenity_id not in self.amenities:
             raise ValueError("Amenity not found")
-        return self.amenities[amenity_id]
+        return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
         """
@@ -236,7 +236,7 @@ class HBnBFacade:
         Performs a query to return all
         Amenity objects present in the database.
         """
-        return Amenity.query.all()
+        return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
         """
@@ -246,16 +246,10 @@ class HBnBFacade:
         attributes with the provided data, then saves the
         changes to the database.
         """
-        amenity = Amenity.query.get(amenity_id)
-    
         if not amenity:
             raise ValueError("Amenity not found")
 
-        for key, value in amenity_data.items():
-            setattr(amenity, key, value)
-
-        db.session.commit()
-        return amenity
+        self.amenity_repo.update(amenity_id, amenity_data)
 
     def create_review(self, review_data):
         """
@@ -277,36 +271,18 @@ class HBnBFacade:
         is missing, or if the user or place
         does not exist.
         """
-        if not review_data or not isinstance(review_data, dict):
-            raise ValueError("Invalid review data")
-
-        required_fields = ["text", "rating", "user_id", "place_id"]
-        for field in required_fields:
-            if field not in review_data:
-                raise ValueError(f"{field} is required")
-
-        if not review_data["text"].strip():
-            raise ValueError("Review text cannot be empty")
-
-        rating = review_data["rating"]
-        if not isinstance(rating, int) or rating < 1 or rating > 5:
-            raise ValueError("Rating must be an integer between 1 and 5")
-
-        user_id = review_data["user_id"]
-        if user_id not in self.users:
-            raise ValueError("User not found")
-
-        place_id = review_data["place_id"]
-        if place_id not in self.places:
-            raise ValueError("Place not found")
+        user = self.user_repo.get(review_data['user_id'])
+        if not user:
+            raise KeyError('Invalid input data')
+        
+        place = self.place_repo.get(review_data['place_id'])
+        if not place:
+            raise KeyError('Invalid input data')
 
         review = Review(**review_data)
-
-        self.reviews[review.id] = review
-
-        place = self.places[place_id]
-        place.reviews.append(review)
-
+        self.review_repo.add(review)
+        user.add_review(review)
+        place.add_review(review)
         return review
 
     def get_review(self, review_id):
@@ -327,7 +303,7 @@ class HBnBFacade:
             raise ValueError("Invalid review id")
         if review_id not in self.reviews:
             raise ValueError("Review not found")
-        return self.reviews[review_id]
+        return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
         """
@@ -336,7 +312,7 @@ class HBnBFacade:
         Returns:
         list: List of all Review instances.
         """
-        return Review.query.all()
+        return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
         """
@@ -352,15 +328,10 @@ class HBnBFacade:
         ValueError: If the location identifier is invalid
         or if the location does not exist.
         """
-        if not place_id or not isinstance(place_id, str):
-            raise ValueError("Invalid place id")
-        if place_id not in self.places:
-            raise ValueError("Place not found")
-        filter_review = []
-        for review in self.reviews.values():
-            if review.place_id == place_id:
-                filet_review.append(review)
-        return filter_review
+        place = self.place_repo.get(place_id)
+        if not place:
+            raise KeyError('Place not found')
+        return place.reviews
 
     def update_review(self, review_id, review_data):
         """
@@ -379,21 +350,11 @@ class HBnBFacade:
 
         Raises:
         ValueError: If the review does not exist.
-        """
-        review = Review.query.get(review_id)
-    
+        """    
         if not review:
             raise ValueError("Review not found")
 
-        allowed_modif = ['text']
-
-        for key, value in review_data.items():
-            if key in allowed_modif:
-                setattr(review, key, value)
-            
-        review.updated_at = datetime.utcnow()
-        db.session.commit()
-        return review
+        self.review_repo.update(review_id, review_data)
 
     def delete_review(self, review_id):
         """
@@ -408,11 +369,11 @@ class HBnBFacade:
         Raises:
         ValueError: If the review does not exist.
         """
-        review = Review.query.get(review_id)
-        if not review:
-            raise ValueError("Review not found")
-            
-        db.session.delete(review)
-        db.session.commit()
+        review = self.review_repo.get(review_id)
+        
+        user = self.user_repo.get(review.user.id)
+        place = self.place_repo.get(review.place.id)
 
-        return True
+        user.delete_review(review)
+        place.delete_review(review)
+        self.review_repo.delete(review_id)
