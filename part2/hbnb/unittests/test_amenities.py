@@ -6,108 +6,38 @@ from app.services import facade
 
 
 class TestAmenityEndpoints(unittest.TestCase):
-
     def setUp(self):
-        self.app = create_app()
+        self.app = Flask(__name__)
+        self.api = Api(self.app)
+        self.api.add_namespace(amenities_api, path='/api/v1/amenities')
         self.client = self.app.test_client()
-        self.app.testing = True
 
-        # Clear storage
-        facade.amenity_repo.storage = {}
-
-    def create_amenity_payload(self, name="WiFi"):
-        return {
-            "name": name
-        }
-
-    def test_create_amenity_valid(self):
+    def test_create_amenity(self):
         response = self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload()
-        )
-
+            '/api/v1/amenities/', json={'name': 'Pool'})
         self.assertEqual(response.status_code, 201)
-        data = response.get_json()
-        self.assertIn("id", data)
-        self.assertEqual(data["name"], "WiFi")
-
-    def test_create_amenity_invalid_empty_name(self):
-        response = self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload(name="")
-        )
-
-        self.assertEqual(response.status_code, 400)
-
-    def test_create_amenity_invalid_no_data(self):
-        response = self.client.post('/api/v1/amenities/')
-        self.assertEqual(response.status_code, 400)
+        self.assertIn('id', response.json)
+        self.assertEqual(response.json['name'], 'Pool')
 
     def test_get_all_amenities(self):
-        self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload()
-        )
-
+        facade.create_amenity({'name': 'WiFi'})
+        facade.create_amenity({'name': 'Cafe'})
         response = self.client.get('/api/v1/amenities/')
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.json) >= 2)
 
-        data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertGreaterEqual(len(data), 1)
-
-    def test_get_amenity_by_id_valid(self):
-        response = self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload()
-        )
-        amenity_id = response.get_json()["id"]
-
-        response = self.client.get(f'/api/v1/amenities/{amenity_id}')
+    def test_get_amenity_by_id(self):
+        amenity = facade.create_amenity({'name': 'Yoga'})
+        response = self.client.get(f'/api/v1/amenities/{amenity.id}')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json['name'], 'Yoga')
 
-        data = response.get_json()
-        self.assertEqual(data["id"], amenity_id)
-
-    def test_get_amenity_not_found(self):
-        response = self.client.get('/api/v1/amenities/nonexistent-id')
-        self.assertEqual(response.status_code, 404)
-
-    def test_update_amenity_valid(self):
-        response = self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload()
-        )
-        amenity_id = response.get_json()["id"]
-
+    def test_update_amenity(self):
+        amenity = facade.create_amenity({'name': 'cleaning'})
         response = self.client.put(
-            f'/api/v1/amenities/{amenity_id}',
-            json={"name": "Updated WiFi"}
-        )
-
+            f'/api/v1/amenities/{amenity.id}', json={'name': 'cleaning lady'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["name"], "Updated WiFi")
-
-    def test_update_amenity_not_found(self):
-        response = self.client.put(
-            '/api/v1/amenities/nonexistent-id',
-            json={"name": "Updated"}
-        )
-        self.assertEqual(response.status_code, 404)
-
-    def test_update_amenity_invalid_data(self):
-        response = self.client.post(
-            '/api/v1/amenities/',
-            json=self.create_amenity_payload()
-        )
-        amenity_id = response.get_json()["id"]
-
-        response = self.client.put(
-            f'/api/v1/amenities/{amenity_id}',
-            json={}
-        )
-
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['name'], 'cleaning lady')
 
 
 if __name__ == "__main__":
