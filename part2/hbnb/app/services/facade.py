@@ -4,6 +4,9 @@ the persistance layer.
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.place import Place
+from app.models.amenity import Amenity
+from app.models.review import Review
+
 
 class HBnBFacade:
     """HBnBFacade acts as an intermediary between the API layer and the
@@ -210,7 +213,7 @@ class HBnBFacade:
             raise ValueError("Amenity name is required")
             
         amenity = Amenity(**amenity_data)
-        self.ameniti_repo.add(amenity)
+        self.amenity_repo.add(amenity)
         return amenity
 
     def get_amenity(self, amenity_id):
@@ -221,11 +224,6 @@ class HBnBFacade:
         Verifies that the identifier is valid and exists in
         memory storage before returning the corresponding object.
         """
-
-        if not amenity_id or not isinstance(amenity_id, int):
-            raise ValueError("Invalid amenity id")
-        if amenity_id not in self.amenities:
-            raise ValueError("Amenity not found")
         return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
@@ -245,10 +243,12 @@ class HBnBFacade:
         attributes with the provided data, then saves the
         changes to the database.
         """
+        amenity = self.get_amenity(amenity_id)
         if not amenity:
-            raise ValueError("Amenity not found")
+            return None
 
         self.amenity_repo.update(amenity_id, amenity_data)
+        return self.get_amenity(amenity_id)
 
     def create_review(self, review_data):
         """
@@ -298,10 +298,6 @@ class HBnBFacade:
         ValueError: If the ID is invalid or if the
         review does not exist.
         """
-        if not review_id or not isinstance(review_id, int):
-            raise ValueError("Invalid review id")
-        if review_id not in self.reviews:
-            raise ValueError("Review not found")
         return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
@@ -350,10 +346,12 @@ class HBnBFacade:
         Raises:
         ValueError: If the review does not exist.
         """    
+        review = self.get_review(review_id)
         if not review:
-            raise ValueError("Review not found")
+            return None
 
         self.review_repo.update(review_id, review_data)
+        return self.get_review(review_id)
 
     def delete_review(self, review_id):
         """
