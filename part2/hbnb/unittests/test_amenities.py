@@ -7,10 +7,11 @@ from app.services import facade
 
 class TestAmenityEndpoints(unittest.TestCase):
     def setUp(self):
-        self.app = Flask(__name__)
-        self.api = Api(self.app)
-        self.api.add_namespace(amenities_api, path='/api/v1/amenities')
+        self.app = create_app()
+        self.app.config['TESTING'] = True
         self.client = self.app.test_client()
+        from app.persistence.repository import InMemoryRepository
+        facade.amenity_repo = InMemoryRepository()
 
     def test_create_amenity(self):
         response = self.client.post(
