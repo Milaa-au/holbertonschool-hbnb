@@ -211,37 +211,3 @@ class PlaceResource(Resource):
             'owner_id': update_place.owner.id
         }, 200
 
-@api.route('/<place_id>/reviews')
-class PlaceReviewList(Resource):
-    @api.response(200, 'List of reviews for the place retrieved successfully')
-    @api.response(404, 'Place not found')
-    def get(self, place_id):
-
-        """
-        Retrieve all reviews associated with a specific location.
-
-        This method first checks whether the location exists using its
-        identifier, then returns the list of reviews linked to
-        that location using the facade layer.
-
-        Args:
-            place_id (str): Unique identifier for the location.
-
-        Returns:
-        tuple:
-            - list: List of reviews associated with the place.
-            - int: HTTP code 200 if successful.
-
-        If the place does not exist:
-            - dict: Error message.
-            - int: HTTP code 404.
-        """
-
-        place = facade.get_place(place_id)
-
-        if not place:
-            return {"message": "Place not found"}, 404
-        reviews = facade.get_reviews_by_place(place_id)
-
-        return [r.to_dict() for r in reviews], 200
-
