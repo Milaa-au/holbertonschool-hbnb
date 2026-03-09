@@ -1,3 +1,4 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 
@@ -18,57 +19,32 @@ class ReviewList(Resource):
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-
-        """
-        Create a new review.
-
-        This endpoint receives JSON data from the request payload
-        and creates a new review using the facade layer.
-
-        Returns:
-            tuple:
-            - dict: The created review data (id, rating, text,
-              place_id, user_id).
-            - int: HTTP status code 201 if creation succeeds.
-
-        If the input data is invalid:
-            - dict: Error message.
-            - int: HTTP status code 400.
-        """
-
-        data = api.payload
-        new_review = facade.create_review(data)
-
-        if not new_review:
-            return {'error': 'Invalid input data'}, 400
-
-        return {'id': new_review.id,
-                'rating': new_review.rating,
-                'text': new_review.text,
-                'place_id': new_review.place_id,
-                'user_id': new_review.user_id}, 201
+        try:
+            data = request.json
+            review_obj = facade.create_review(data)
+            return {
+                "id": str(review_obj.id),
+                "text": review_obj.text,
+                "rating": int(review_obj.rating),
+                "user_id": str(review_obj.user.id),
+                "place_id": str(review_obj.place.id)
+            }, 201
+        except Exception as e:
+            return {'message': str(e)}, 400
 
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
-
-        """Retrieve the list of all reviews.
-
-        This method queries the facade layer to obtain
-        all reviews stored in the system.
-
-        Returns:
-            tuple:
-            - dict: Review data.
-            - int: HTTP code 200 if successful.
-        """
-
         reviews = facade.get_all_reviews()
-
-        return {'id': new_review.id,
-                'rating': new_review.rating,
-                'text': new_review.text,
-                'place_id': new_review.place_id,
-                'user_id': new_review.user_id}, 200
+        return [
+            {
+                "id": str(r.id),
+                "text": r.text,
+                "rating": int(r.rating),
+                "user_id": str(r.user.id),
+                "place_id": str(r.place.id)
+            }
+            for r in reviews
+        ], 200
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):
@@ -76,67 +52,22 @@ class ReviewResource(Resource):
     @api.response(200, 'Review details retrieved successfully')
     @api.response(404, 'Review not found')
     def get(self, review_id):
-
-        """Retrieve the details of a review by its ID.
-
-        This method searches for a review based on its ID
-        via the facade layer.
-
-        Args:
-        review_id (str): Unique identifier of the review.
-
-        Returns:
-        tuple:
-            - dict: The review data, if it exists.
-            - int: HTTP code 200 if successful.
-
-        If the review does not exist:
-            - dict: Error message.
-            - int: HTTP code 404.
-
-        Translated with DeepL.com (free version)
-        """
-
         review = facade.get_review(review_id)
 
         if not review:
             return {'error': 'Review not found'}, 404
 
-        return {'id': new_review.id,
-                'rating': new_review.rating,
-                'text': new_review.text,
-                'place_id': new_review.place_id,
-                'user_id': new_review.user_id}, 200
+        return {'id': review.id,
+                'rating': review.rating,
+                'text': review.text,
+                'place_id': review.place.id,
+                'user_id': review.user.id}, 200
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
-
-        """
-        Update review information.
-
-        This method updates an existing review based on
-        the JSON data received in the request.
-
-        Args:
-            review_id (str): Unique identifier for the review.
-
-        Returns:
-        tuple:
-            - dict: Updated review data.
-            - int: HTTP code 200 if successful.
-
-        If the review does not exist:
-            - dict: Error message.
-            - int: HTTP code 404.
-
-        If the data is invalid:
-            - dict: Error message.
-            - int: HTTP code 400.
-        """
-
         data = api.payload
         review = facade.get_review(review_id)
 
@@ -147,37 +78,96 @@ class ReviewResource(Resource):
         if not updated_review:
             return {'error': 'Invalid input data'}, 400
 
-        return {'id': new_review.id,
-                'rating': new_review.rating,
-                'text': new_review.text,
-                'place_id': new_review.place_id,
-                'user_id': new_review.user_id}, 200
+        return {'id': updated_review.id,
+                'rating': updated_review.rating,
+                'text': updated_review.text,
+                'place_id': updated_review.place.id,
+                'user_id': updated_review.user.id}, 200
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
 
     def delete(self, review_id):
-
-        """Delete a review.
-
-        This method deletes an existing review via its
-        identifier using the facade layer.
-
-        Args:
-        review_id (str): Unique identifier of the review.
-
-        Returns:
-        tuple:
-            - dict: Confirmation message.
-            - int: HTTP code 200 if successful.
-
-        If the review does not exist:
-            - dict: Error message.
-            - int: HTTP code
-        """
-
-        delete_review = facade.delete_review(review_id)
-
+        delete_review = facade.get_review(review_id)
         if not delete_review:
             return {'error': 'Review not found'}, 404
+
+        facade.delete_review(review_id)
         return {'message': 'Review deleted successfully'}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"message": "Place not found"}, 404
+        reviews = facade.get_reviews_by_place(place_id)
+
+        return [
+            {
+                "id": str(r.id),
+                "text": r.text,
+                "rating": int(r.rating),
+                "user_id": str(r.user.id),
+                "place_id": str(r.place.id)
+            }
+            for r in reviews
+        ], 200
+
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+
+        return {'id': review.id,
+                'rating': review.rating,
+                'text': review.text,
+                'place_id': review.place.id,
+                'user_id': review.user.id}, 200
+
+    @api.expect(review_model)
+    @api.response(200, 'Review updated successfully')
+    @api.response(404, 'Review not found')
+    @api.response(400, 'Invalid input data')
+    def put(self, review_id):
+        data = api.payload
+        review = facade.get_review(review_id)
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+        updated_review = facade.update_review(review_id, data)
+
+        if not updated_review:
+            return {'error': 'Invalid input data'}, 400
+
+        return {'id': updated_review.id,
+                'rating': updated_review.rating,
+                'text': updated_review.text,
+                'place_id': updated_review.place.id,
+                'user_id': updated_review.user.id}, 200
+
+    @api.response(200, 'Review deleted successfully')
+    @api.response(404, 'Review not found')
+
+    def delete(self, review_id):
+        delete_review = facade.get_review(review_id)
+        if not delete_review:
+            return {'error': 'Review not found'}, 404
+
+        facade.delete_review(review_id)
+        return {'message': 'Review deleted successfully'}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"message": "Place not found"}, 404
+        reviews = facade.get_reviews_by_place(place_id)
+
+        return [r.to_dict() for r in reviews], 200
