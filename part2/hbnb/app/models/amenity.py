@@ -1,39 +1,42 @@
 #!/usr/bin/python3
-"""
-Amenity model.
-
-This module defines the Amenity entity which represents a feature
-or service that can be associated with a place (e.g., Wi-Fi, pool).
-"""
-
 
 from app.models.base_model import BaseModel
 
-
 class Amenity(BaseModel):
     """
-    Amenity domain model.
+    The Amenity class extends BaseModel, inheriting common attributes such as:
+    id (UUID)
+    created_at
+    updated_at
 
-    Represents a single amenity that can be attached to a place.
-    Each amenity has a name with validation constraints.
+    The constructor ensures data integrity 
+    by validating the name attribute:
+    It checks that a name is provided.
+    It ensures the name does not exceed 50 characters.
+    It raises a ValueError if validation fails.
     """
 
     def __init__(self, name):
         """
-        Initialize a new Amenity instance.
-
-        Validates that the name is provided and within the
-        allowed length limit.
-
-        Args:
-            name (str): Name of the amenity (required, max 50 characters).
-
-        Raises:
-            ValueError: If name is missing or exceeds length constraints.
+        This constructor initializes a new Amenity instance.
+        It first calls the parent class constructor (BaseModel) 
+        to initialize common attributes such as the unique 
+        identifier and timestamps.
+        Then, it validates the name parameter:
+        It ensures that a name is provided. 
+        If the name is missing or empty, a ValueError is raised.
+        It checks that the name does not exceed 50 characters. 
+        If it does, a ValueError is raised.
+        If all validations pass, the name attribute is assigned to the instance.
+        This guarantees that every Amenity object is created 
+        with valid and consistent data.
         """
         super().__init__()
+
         if not name:
             raise ValueError("Name is required")
+
         if len(name) > 50:
             raise ValueError("Name must be 50 characters or less")
+
         self.name = name

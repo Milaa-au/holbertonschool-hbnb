@@ -150,6 +150,46 @@ This abstraction allows the storage mechanism to be replaced later (e.g., databa
 * Reusability.
 * Clean separation between logic and persistence.
 ---
+## **Unit test:**
+### Description:
+The project includes automated unit tests to ensure the reliability, stability, and correctness of each layer of the application.
+
+### **The tests validate:**
+* Business rules inside models (data validation, constraints).
+* Facade logic and entity coordination.
+* API endpoints behavior (status codes, validation, error handling).
+* Repository CRUD operations.
+
+Unit tests help detect regressions early and guarantee that future modifications do not break existing functionality.
+
+### **Test Coverage Includes:**
+### Model Tests:
+
+* Field validation (required fields).
+* Boundary conditions (e.g., max length for names).
+* Email format validation.
+* Rating and coordinate constraints.
+* Exception handling (ValueError).
+
+### API Tests:
+
+* Successful resource creation (201).
+* Retrieval of single and multiple resources (200).
+* Validation errors (400).
+* Not found errors (404).
+* Boundary value testing.
+* Data integrity checks.
+
+### Facade & Repository Tests:
+
+* Entity creation and update logic.
+* Relationship validation.
+* In-memory storage behavior.
+
+### Running all tests:
+* **"python3 -m unittest discover unittests"**
+
+---
 ## **Installation:**
 
 ### Installing dependencies using:
@@ -168,6 +208,7 @@ This abstraction allows the storage mechanism to be replaced later (e.g., databa
 
 ---
 ## **Testing the API with curl:**
+## Examples:
 ### **1.Create a User:**
 * curl -X POST http://127.0.0.1:5000/api/v1/users/ \
 -H "Content-Type: application/json" \

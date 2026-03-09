@@ -145,4 +145,3 @@ class Place(BaseModel):
             raise ValueError("amenity must be an Amenity instance")
         if amenity not in self.amenities:
             self.amenities.append(amenity)
-

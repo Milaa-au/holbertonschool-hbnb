@@ -1,44 +1,35 @@
 #!/usr/bin/python3
-"""
-Review model.
-
-This module defines the Review entity which represents a user's
-evaluation of a place, including textual feedback and a numeric rating.
-"""
-
 
 from app.models.base_model import BaseModel
 from app.models.user import User
 from app.models.place import Place
 
-
 class Review(BaseModel):
     """
-    Review domain model.
+    Class representing a review of a place by a user.
 
-    Represents a review left by a user for a specific place.
-    A review contains a text comment, a rating between 1 and 5,
-    and references to the related user and place.
+    Attributes:
+        text (str): Text of the comment
+        rating (int): Rating from 1 to 5
+        place (Place): Place associated with the review
+        user (User): User who wrote the review
     """
 
     def __init__(self, text, rating, place, user):
         """
-        Initialize a new Review instance.
-
-        Performs validation on the review content, rating range,
-        and ensures that associated objects are valid instances.
+        Initializes a new instance of Review.
 
         Args:
-            text (str): The review content. Must not be empty.
-            rating (int): Numeric score between 1 and 5.
-            place (Place): The place being reviewed.
-            user (User): The user who created the review.
+            text (str): Text of the comment
+            rating (int): Rating from 1 to 5
+            place (Place): Associated location
+            user (User): Author of the review
 
         Raises:
-            ValueError: If text is missing, rating is invalid,
-                or place/user are not valid instances.
+            ValueError: if validations fail
         """
         super().__init__()
+
         if not text:
             raise ValueError("text is required")
         self.text = text
