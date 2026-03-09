@@ -116,4 +116,3 @@ class PlaceReviewList(Resource):
             }
             for r in reviews
         ], 200
-
