@@ -41,38 +41,74 @@ class Place(BaseModel):
             ValueError: If any field is missing or invalid.
         """
         super().__init__()
-        if not title:
-            raise ValueError("Title is required")
-        if len(title) > 100:
-            raise ValueError("Title must be 100 characters or less")
         self.title = title
-
         self.description = description
-
-        if not isinstance(price, (int, float)):
-            raise ValueError("Price must be an integer or a float")
-        if price <= 0:
-            raise ValueError("Price must be greater than 0")
         self.price = price
-
-        if not isinstance(latitude, (int, float)):
-            raise ValueError("Latitude must be a number")
-        if latitude < -90 or latitude > 90:
-            raise ValueError("Latitude must be between -90 and 90")
         self.latitude = latitude
-
-        if not isinstance(longitude, (int, float)):
-            raise ValueError("Longitude must be a number")
-        if longitude < -180 or longitude > 180:
-            raise ValueError("Longitude must be between -180 and 180")
         self.longitude = longitude
-
-        if not isinstance(owner, User):
-            raise ValueError("Owner must be a User instance")
         self.owner = owner
-
         self.reviews = []
         self.amenities = []
+
+    @property
+    def title(self):
+        return self.__title
+
+    @title.setter
+    def title(self, value):
+        if not value:
+            raise ValueError("Title is required")
+        if not isinstance(value, str):
+            raise TypeError("Title must be a string")
+        if len(value) > 100:
+            raise ValueError("Title must be 100 characters or less")
+        self.__title = value
+
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, value):
+        if not isinstance(value, (int, float)):
+            raise ValueError("Price must be an integer or a float")
+        if value <= 0:
+            raise ValueError("Price must be greater than 0")
+        self.__price = value
+
+    @property
+    def latitude(self):
+        return self.__latitude
+
+    @latitude.setter
+    def latitude(self, value):
+        if value is None or not isinstance(value, (int, float)):
+            raise ValueError("Latitude must be a number")
+        if value < -90 or value > 90:
+            raise ValueError("Latitude must be between -90 and 90")
+        self.__latitude = value
+
+    @property
+    def longitude(self):
+        return self.__longitude
+
+    @longitude.setter
+    def longitude(self, value):
+        if not isinstance(value, (int, float)):
+            raise ValueError("Longitude must be a number")
+        if value < -180 or value > 180:
+            raise ValueError("Longitude must be between -180 and 180")
+        self.__longitude = value
+
+    @property
+    def owner(self):
+        return self.__owner
+
+    @owner.setter
+    def owner(self, value):
+        if not isinstance(value, User):
+            raise ValueError("Owner must be a User instance")
+        self.__owner = value
 
     def add_review(self, review):
         """
@@ -88,7 +124,12 @@ class Place(BaseModel):
 
         if not isinstance(review, Review):
             raise ValueError("review must be a Review instance")
-        self.reviews.append(review)
+        if review not in self.reviews:
+            self.reviews.append(review)
+
+    def delete_review(self, review):
+        """Add an amenity to the place."""
+        self.reviews.remove(review)
 
     def add_amenity(self, amenity):
         """
@@ -101,5 +142,7 @@ class Place(BaseModel):
             ValueError: If amenity is not a valid Amenity instance.
         """
         if not isinstance(amenity, Amenity):
-            raise ValueError("amenity must be a Amenity instance")
-        self.amenities.append(amenity)
+            raise ValueError("amenity must be an Amenity instance")
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
+

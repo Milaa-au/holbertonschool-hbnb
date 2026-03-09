@@ -79,15 +79,15 @@ class PlaceList(Resource):
     def get(self):
         """Retrieve a list of all places"""
         places = facade.get_all_places()
-        List_places = []
+        list_places = []
         for place in places:
-            List_places.append({
+            list_places.append({
                 'id': place.id,
                 'title': place.title,
                 'latitude': place.latitude,
                 'longitude': place.longitude
             })
-        return List_places, 200
+        return list_places, 200
 
 
 @api.route('/<place_id>')
@@ -128,15 +128,13 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
-
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
         try:
             update_place = facade.update_place(place_id, place_data)
         except ValueError as error:
             return {'error': str(error)}, 400
-
-        if not update_place:
-            return {'error': 'Place not found'}, 404
-
         return {
             'id': update_place.id,
             'title': update_place.title,
@@ -146,3 +144,49 @@ class PlaceResource(Resource):
             'longitude': update_place.longitude,
             'owner_id': update_place.owner.id
         }, 200
+
+@api.route('/<place_id>/amenities')
+class PlaceAmenities(Resource):
+    @api.expect(amenity_model)
+    @api.response(200, 'Amenities added successfully')
+    @api.response(404, 'Place not found')
+    @api.response(400, 'Invalid input data')
+    def post(self, place_id):
+        amenities_data = api.payload
+        if not amenities_data or len(amenities_data) == 0:
+            return {'error': 'Invalid input data'}, 400
+        
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+        
+        for amenity in amenities_data:
+            a = facade.get_amenity(amenity['id'])
+            if not amenity:
+                return {'error': 'Invalid input data'}, 400
+        
+        for amenity in amenities_data:
+            place.add_amenity(a)
+        return {'message': 'Amenities added successfully'}, 200
+
+@api.route('/<place_id>/reviews/')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+        reviews = place.reviews
+
+        return [
+            {
+                'id': review.id,
+                'text': review.text,
+                'rating': review.rating,
+                'place_id': review.place.id,
+                'user_id': review.user.id
+            }
+            for review in reviews
+        ], 200
