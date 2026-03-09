@@ -199,10 +199,16 @@ class HBnBFacade:
         user = self.user_repo.get(review_data['user_id'])
         if not user:
             raise KeyError('Invalid input data')
-        
+
+        del review_data['user_id']
+        review_data['user'] = user
+
         place = self.place_repo.get(review_data['place_id'])
         if not place:
             raise KeyError('Invalid input data')
+
+        del review_data['place_id']
+        review_data['place'] = place
 
         review = Review(**review_data)
         self.review_repo.add(review)

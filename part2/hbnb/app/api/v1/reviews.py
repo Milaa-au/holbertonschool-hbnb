@@ -1,56 +1,173 @@
-#!/usr/bin/python3
-
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 
-api = Namespace('amenities', description='Amenity operations')
+api = Namespace('reviews', description='Review operations')
 
-amenity_model = api.model('Amenity', {
-    'name': fields.String(required=True, description='Name of the amenity')
+# Define the review model for input validation and documentation
+review_model = api.model('Review', {
+    'text': fields.String(required=True, description='Text of the review'),
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+    'user_id': fields.String(required=True, description='ID of the user'),
+    'place_id': fields.String(required=True, description='ID of the place')
 })
 
 @api.route('/')
-class AmenityList(Resource):
-    @api.expect(amenity_model)
-    @api.response(201, 'Amenity successfully created')
+class ReviewList(Resource):
+
+    @api.expect(review_model)
+    @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        amenity_data = api.payload
         try:
-            new_amenity = facade.create_amenity(amenity_data)
-            return {'id': new_amenity.id, 'name': new_amenity.name}, 201
-        except ValueError as i:
-            return {'message': str(i)}, 400
-
-    @api.response(200, 'List of amenities retrieved successfully')
-    def get(self):
-        amenities = facade.get_all_amenities()
-        return [{'id': amenity.id, 'name': amenity.name} for amenity in amenities], 200
-
-@api.route('/<amenity_id>')
-class AmenityResource(Resource):
-    @api.response(200, 'Amenity details retrieved successfully')
-    @api.response(404, 'Amenity not found')
-    def get(self, amenity_id):
-        amenity = facade.get_amenity(amenity_id)
-        if not amenity:
-            return {'error': 'Amenity not found'}, 404
-        return {'id': amenity.id, 'name': amenity.name}, 200
-
-    @api.expect(amenity_model)
-    @api.response(200, 'Amenity updated successfully')
-    @api.response(404, 'Amenity not found')
-    @api.response(400, 'Invalid input data')
-    def put(self, amenity_id):
-        amenity_data = api.payload
-        try:
-            updated_amenity = facade.update_amenity(
-                amenity_id, amenity_data)
-            if not updated_amenity:
-                return {'error': 'Amenity not found'}, 404
+            data = request.json
+            review_obj = facade.create_review(data)
             return {
-                'id': updated_amenity.id,
-                'name': updated_amenity.name
-            }, 200
-        except ValueError as i:
-            return {'message': str(i)}, 400
+                "id": str(review_obj.id),
+                "text": review_obj.text,
+                "rating": int(review_obj.rating),
+                "user_id": str(review_obj.user.id),
+                "place_id": str(review_obj.place.id)
+            }, 201
+        except Exception as e:
+            return {'message': str(e)}, 400
+
+    @api.response(200, 'List of reviews retrieved successfully')
+    def get(self):
+        reviews = facade.get_all_reviews()
+        return [
+            {
+                "id": str(r.id),
+                "text": r.text,
+                "rating": int(r.rating),
+                "user_id": str(r.user.id),
+                "place_id": str(r.place.id)
+            }
+            for r in reviews
+        ], 200
+
+@api.route('/<review_id>')
+class ReviewResource(Resource):
+
+    @api.response(200, 'Review details retrieved successfully')
+    @api.response(404, 'Review not found')
+    def get(self, review_id):
+        review = facade.get_review(review_id)
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+
+        return {'id': review.id,
+                'rating': review.rating,
+                'text': review.text,
+                'place_id': review.place.id,
+                'user_id': review.user.id}, 200
+
+    @api.expect(review_model)
+    @api.response(200, 'Review updated successfully')
+    @api.response(404, 'Review not found')
+    @api.response(400, 'Invalid input data')
+    def put(self, review_id):
+        data = api.payload
+        review = facade.get_review(review_id)
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+        updated_review = facade.update_review(review_id, data)
+
+        if not updated_review:
+            return {'error': 'Invalid input data'}, 400
+
+        return {'id': updated_review.id,
+                'rating': updated_review.rating,
+                'text': updated_review.text,
+                'place_id': updated_review.place.id,
+                'user_id': updated_review.user.id}, 200
+
+    @api.response(200, 'Review deleted successfully')
+    @api.response(404, 'Review not found')
+
+    def delete(self, review_id):
+        delete_review = facade.get_review(review_id)
+        if not delete_review:
+            return {'error': 'Review not found'}, 404
+
+        facade.delete_review(review_id)
+        return {'message': 'Review deleted successfully'}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"message": "Place not found"}, 404
+        reviews = facade.get_reviews_by_place(place_id)
+
+        return [
+            {
+                "id": str(r.id),
+                "text": r.text,
+                "rating": int(r.rating),
+                "user_id": str(r.user.id),
+                "place_id": str(r.place.id)
+            }
+            for r in reviews
+        ], 200
+
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+
+        return {'id': review.id,
+                'rating': review.rating,
+                'text': review.text,
+                'place_id': review.place.id,
+                'user_id': review.user.id}, 200
+
+    @api.expect(review_model)
+    @api.response(200, 'Review updated successfully')
+    @api.response(404, 'Review not found')
+    @api.response(400, 'Invalid input data')
+    def put(self, review_id):
+        data = api.payload
+        review = facade.get_review(review_id)
+
+        if not review:
+            return {'error': 'Review not found'}, 404
+        updated_review = facade.update_review(review_id, data)
+
+        if not updated_review:
+            return {'error': 'Invalid input data'}, 400
+
+        return {'id': updated_review.id,
+                'rating': updated_review.rating,
+                'text': updated_review.text,
+                'place_id': updated_review.place.id,
+                'user_id': updated_review.user.id}, 200
+
+    @api.response(200, 'Review deleted successfully')
+    @api.response(404, 'Review not found')
+
+    def delete(self, review_id):
+        delete_review = facade.get_review(review_id)
+        if not delete_review:
+            return {'error': 'Review not found'}, 404
+
+        facade.delete_review(review_id)
+        return {'message': 'Review deleted successfully'}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"message": "Place not found"}, 404
+        reviews = facade.get_reviews_by_place(place_id)
+
+        return [r.to_dict() for r in reviews], 200
