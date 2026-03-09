@@ -162,7 +162,7 @@ class PlaceAmenities(Resource):
         
         for amenity in amenities_data:
             a = facade.get_amenity(amenity['id'])
-            if not amenity:
+            if not a:
                 return {'error': 'Invalid input data'}, 400
         
         for amenity in amenities_data:

@@ -45,7 +45,7 @@ class TestReviewEndpoints(unittest.TestCase):
             }
         )
         self.assertEqual(response.status_code, 201)
-        self.assertIn('Review id', response.json)
+        self.assertIn('id', response.json)
         self.assertEqual(response.json['text'], 'Great place!')
         self.assertEqual(response.json['rating'], 5)
 
