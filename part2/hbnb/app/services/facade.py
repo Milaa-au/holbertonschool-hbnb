@@ -20,51 +20,21 @@ class HBnBFacade:
         self.amenity_repo = InMemoryRepository()
 
     def create_user(self, user_data):
-        """
-        Creates a new user.
-
-        Args:
-        user_data (dict): Dictionary containing user information.
-
-        Returns:
-        User: The created user object.
-        """
+        """create_user that create user"""
         user = User(**user_data)
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
-        """
-        Retrieves a user by their ID.
-
-        Args:
-        user_id (str): User ID.
-
-        Returns:
-        User: The corresponding user object or None if not found.
-        """
+        """get_user that retrieved an user"""
         return self.user_repo.get(user_id)
 
     def get_all_users(self):
-        """
-        Retrieves all users.
-
-        Returns:
-        list: List of all user objects.
-        """
+        """get_all_users that retrieved all users"""
         return self.user_repo.get_all()
 
     def update_user(self, user_id, user_data):
-        """
-        Updates the information for an existing user.
-
-        Args:
-        user_id (str): ID of the user to update.
-        user_data (dict): Dictionary of fields to update.
-
-        Returns:
-        User: The updated user object, or None if the user does not exist.
-        """
+        """update_user that update an user"""
         user = self.get_user(user_id)
         if not user:
             return None
@@ -72,30 +42,12 @@ class HBnBFacade:
         return self.get_user(user_id)
 
     def get_user_by_email(self, email):
-        """
-        Retrieves a user from their email address.
-
-        Args:
-        email (str): The user's email address.
-
-        Returns:
-        User: The corresponding user object or None if not found.
-        """
+        """get_user_by_email that retrieved an user via an email"""
         return self.user_repo.get_by_attribute('email', email)
 
     def create_place(self, place_data):
-        """
-        Creates a new place with validation of required fields.
+        """Create a new place with validation"""
 
-        Args:
-        place_data (dict): Dictionary containing the place information.
-
-        Raises:
-        ValueError: If a required field is missing or invalid.
-
-        Returns:
-        Place: The created place object.
-        """
         try:
             owner_id = place_data["owner_id"]
             title = place_data["title"]
@@ -130,41 +82,15 @@ class HBnBFacade:
         return place
 
     def get_place(self, place_id):
-        """
-            Retrieves a place by its identifier.
-
-        Args:
-        place_id (str): Identifier of the place.
-
-        Returns:
-        Place: The corresponding place object or None if not found.
-        """
+        """get_place that retrieved place"""
         return self.place_repo.get(place_id)
 
     def get_all_places(self):
-        """
-        Retrieves all existing locations.
-
-        Returns:
-        list: List of all location objects.
-        """
+        """get_all_places that retrieved all places"""
         return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        """
-        Updates an existing place with validation of modified fields.
-
-        Args:
-        place_id (str): ID of the place to be updated.
-        place_data (dict): Dictionary containing the fields to be updated.
-
-        Raises:
-        ValueError: If a value is invalid (price <= 0, 
-        latitude/longitude out of bounds, invalid title).
-
-        Returns:
-        Place: The updated place object or None if the place does not exist.
-        """
+        """update_place that update a place"""
         place = self.get_place(place_id)
         if not place:
             return None

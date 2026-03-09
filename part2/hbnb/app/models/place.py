@@ -1,105 +1,147 @@
 #!/usr/bin/python3
+"""
+Place model.
+
+This module defines the Place entity which represents a property
+listed in the application. It includes location data, pricing,
+ownership, and relationships with reviews and amenities.
+"""
+
 
 from app.models.base_model import BaseModel
+from app.models.user import User
+from app.models.amenity import Amenity
+
 
 class Place(BaseModel):
     """
-    Class representing a place (Place) in the HBnB system.
+    Place domain model.
 
-    Attributes:
-        - title (str): Title or name of the place (max 100 characters).
-        - description (str): Description of the place.
-        - price (int | float): Price of the place, must be > 0.
-        - latitude (float): Latitude of the place (-90 to 90).
-        - longitude (float): Longitude of the place (-180 to 180).
-        - owner (User): Owner of the place (instance of User).
-        - reviews (list): List of reviews associated with the place.
-        - amenities (list): List of amenities associated with the place.
+    Represents a property that can be listed by a user. A place
+    includes descriptive information, geographic coordinates,
+    pricing, an owner, and collections of reviews and amenities.
     """
 
-    def __init__(self, name, description, price, latitude, longitude):
+    def __init__(self, title, description, price, latitude, longitude, owner):
         """
-        Initializes a new instance of Place.
+        Initialize a new Place instance.
 
-        Performs the following validations:
-            - title must be non-empty and <= 100 characters
-            - price must be an int or float and > 0
-            - latitude must be between -90 and 90
-            - longitude must be between -180 and 180
-            - owner must be an instance of User
+        Validates required fields, numeric ranges for coordinates,
+        and ensures the owner is a valid User instance.
+
+        Args:
+            title (str): Name of the place (required, max 100 characters).
+            description (str): Optional description of the place.
+            price (float | int): Price per stay, must be greater than 0.
+            latitude (float | int): Geographic latitude (-90 to 90).
+            longitude (float | int): Geographic longitude (-180 to 180).
+            owner (User): The user who owns the place.
+
+        Raises:
+            ValueError: If any field is missing or invalid.
         """
-
         super().__init__()
-
-        if not title:
-
-            raise ValueError("Title is required")
-
-        if len(title) > 100:
-
-            raise ValueError("Title must be 100 characters or less")
-
         self.title = title
-
         self.description = description
-
-        if not isinstance(price, (int, float)):
-
-            raise ValueError("Price must be an integer or a float")
-
-        if price <= 0:
-
-            raise ValueError("Price must be greater than 0")
-
         self.price = price
-
-        if not isinstance(latitude, (int, float)):
-
-            raise ValueError("Latitude must be a number")
-
-        if latitude < -90 or latitude > 90:
-
-            raise ValueError("Latitude must be between -90 and 90")
-
         self.latitude = latitude
-
-        if not isinstance(longitude, (int, float)):
-            raise ValueError("Longitude must be a number")
-        if longitude < -180 or longitude > 180:
-            raise ValueError("Longitude must be between -180 and 180")
         self.longitude = longitude
-
-        if not isinstance(owner, User):
-            raise ValueError("Owner must be a User instance")
         self.owner = owner
-
         self.reviews = []
         self.amenities = []
 
+    @property
+    def title(self):
+        return self.__title
+
+    @title.setter
+    def title(self, value):
+        if not value:
+            raise ValueError("Title is required")
+        if not isinstance(value, str):
+            raise TypeError("Title must be a string")
+        if len(value) > 100:
+            raise ValueError("Title must be 100 characters or less")
+        self.__title = value
+
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, value):
+        if not isinstance(value, (int, float)):
+            raise ValueError("Price must be an integer or a float")
+        if value <= 0:
+            raise ValueError("Price must be greater than 0")
+        self.__price = value
+
+    @property
+    def latitude(self):
+        return self.__latitude
+
+    @latitude.setter
+    def latitude(self, value):
+        if value is None or not isinstance(value, (int, float)):
+            raise ValueError("Latitude must be a number")
+        if value < -90 or value > 90:
+            raise ValueError("Latitude must be between -90 and 90")
+        self.__latitude = value
+
+    @property
+    def longitude(self):
+        return self.__longitude
+
+    @longitude.setter
+    def longitude(self, value):
+        if not isinstance(value, (int, float)):
+            raise ValueError("Longitude must be a number")
+        if value < -180 or value > 180:
+            raise ValueError("Longitude must be between -180 and 180")
+        self.__longitude = value
+
+    @property
+    def owner(self):
+        return self.__owner
+
+    @owner.setter
+    def owner(self, value):
+        if not isinstance(value, User):
+            raise ValueError("Owner must be a User instance")
+        self.__owner = value
+
     def add_review(self, review):
         """
-        Adds a review to the location.
+        Add a review to the place.
 
         Args:
-            review (Review): instance of Review to add
+            review (Review): Review instance to associate with the place.
 
         Raises:
-            ValueError: if the object is not an instance of Review
+            ValueError: If review is not a valid Review instance.
         """
+        from app.models.review import Review
+
         if not isinstance(review, Review):
             raise ValueError("review must be a Review instance")
-        self.reviews.append(review)
+        if review not in self.reviews:
+            self.reviews.append(review)
+
+    def delete_review(self, review):
+        """Add an amenity to the place."""
+        self.reviews.remove(review)
 
     def add_amenity(self, amenity):
         """
-        Adds an amenity to the location.
+        Add an amenity to the place.
 
         Args:
-            amenity (Amenity): instance of Amenity to add
+            amenity (Amenity): Amenity instance to associate with the place.
 
         Raises:
-            ValueError: if the object is not an instance of Amenity
+            ValueError: If amenity is not a valid Amenity instance.
         """
         if not isinstance(amenity, Amenity):
-            raise ValueError("amenity must be a Amenity instance")
-        self.amenities.append(amenity)
+            raise ValueError("amenity must be an Amenity instance")
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
