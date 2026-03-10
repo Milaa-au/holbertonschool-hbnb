@@ -29,21 +29,51 @@ class Review(BaseModel):
             ValueError: if validations fail
         """
         super().__init__()
-
-        if not text:
-            raise ValueError("text is required")
         self.text = text
-
-        if not isinstance(rating, int):
-            raise ValueError("Rating must be an integer")
-        if rating < 1 or rating > 5:
-            raise ValueError("Rating must be between 1 and 5")
         self.rating = rating
-
-        if not isinstance(place, Place):
-            raise ValueError("place must be a Place instance")
         self.place = place
-
-        if not isinstance(user, User):
-            raise ValueError("user must be a User instance")
         self.user = user
+
+    @property
+    def text(self):
+        return self.__text
+
+    @text.setter
+    def text(self, value):
+        if not value:
+            raise ValueError("text is required")
+        if not isinstance(value, str):
+            raise TypeError("Text must be a string")
+        self.__text = value
+
+    @property
+    def rating(self):
+        return self.__rating
+
+    @rating.setter
+    def rating(self, value):
+        if not isinstance(value, int):
+            raise ValueError("Rating must be an integer")
+        if value < 1 or value > 5:
+            raise ValueError("Rating must be between 1 and 5")
+        self.__rating = value
+
+    @property
+    def place(self):
+        return self.__place
+
+    @place.setter
+    def place(self, value):
+        if not isinstance(value, Place):
+            raise ValueError("place must be a Place instance")
+        self.__place = value
+
+    @property
+    def user(self):
+        return self.__use
+
+    @user.setter
+    def user(self, value):
+        if not isinstance(value, User):
+            raise ValueError("user must be a User instance")
+        self.__user = value

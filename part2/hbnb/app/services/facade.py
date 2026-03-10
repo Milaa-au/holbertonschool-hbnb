@@ -19,6 +19,7 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
+    # USER
     def create_user(self, user_data):
         """create_user that create user"""
         user = User(**user_data)
@@ -45,6 +46,7 @@ class HBnBFacade:
         """get_user_by_email that retrieved an user via an email"""
         return self.user_repo.get_by_attribute('email', email)
 
+    # PLACE
     def create_place(self, place_data):
         """Create a new place with validation"""
 
@@ -98,21 +100,6 @@ class HBnBFacade:
         place_data.pop("owner_id", None)
         place_data.pop("amenities", None)
 
-        if "price" in place_data and place_data["price"] <= 0:
-            raise ValueError("Price must be greater than 0")
-
-        if "latitude" in place_data:
-            if place_data["latitude"] < -90 or place_data["latitude"] > 90:
-                raise ValueError("Latitude must be between -90 and 90")
-
-        if "longitude" in place_data:
-            if place_data["longitude"] < -180 or place_data["longitude"] > 180:
-                raise ValueError("Longitude must be between -180 and 180")
-
-        if "title" in place_data:
-            if not place_data["title"] or len(place_data["title"]) > 100:
-                raise ValueError("Invalid title")
-
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
 
@@ -142,6 +129,7 @@ class HBnBFacade:
         self.amenity_repo.add(amenity)
         return amenity
 
+    # AMENITY
     def get_amenity(self, amenity_id):
 
         """
@@ -176,6 +164,7 @@ class HBnBFacade:
         self.amenity_repo.update(amenity_id, amenity_data)
         return self.get_amenity(amenity_id)
 
+    # REVIEW
     def create_review(self, review_data):
         """
         Create a new review after validating the data.

@@ -52,5 +52,5 @@ class InMemoryRepository(Repository):
         return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
 
     def clear(self):
-        """Remove all objects from the repository"""
+        """Remove all stored objects"""
         self._storage = {}
