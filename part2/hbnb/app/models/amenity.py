@@ -32,11 +32,23 @@ class Amenity(BaseModel):
         with valid and consistent data.
         """
         super().__init__()
+        self.name = name
 
-        if not name:
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str):
+            raise TypeError("Name must be a string")
+
+        if not value:
             raise ValueError("Name is required")
 
-        if len(name) > 50:
+        if len(value) > 50:
             raise ValueError("Name must be 50 characters or less")
+        self.__name = value
 
-        self.name = name
+    def update(self, data):
+        return super().update(data)
