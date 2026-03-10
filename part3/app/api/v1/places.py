@@ -45,24 +45,6 @@ place_model = api.model('Place', {
     )
 })
 
-review_model = api.model('PlaceReview', {
-    'id': fields.String(description='Review ID'),
-    'text': fields.String(description='Text of the review'),
-    'rating': fields.Integer(description='Rating of the place (1-5)'),
-    'user_id': fields.String(description='ID of the user')
-})
-
-place_model = api.model('Place', {
-    'title': fields.String(required=True, description='Title of the place'),
-    'description': fields.String(description='Description of the place'),
-    'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
-    'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
-    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
-})
 
 @api.route('/')
 class PlaceList(Resource):
@@ -76,18 +58,7 @@ class PlaceList(Resource):
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """
-        Register a new place.
-
-        Retrieves the JSON payload from the API request and attempts to create
-        a new place using the facade. If creation fails due to invalid data,
-        returns a 400 response with an error message.
-
-        Returns:
-        tuple: A JSON dictionary containing the new place details and
-        the HTTP status code 201 if successful, or an error message and
-        status code 400 if creation fails.
-        """
+        """Register a new place"""
         place_data = api.payload
 
         try:
@@ -106,26 +77,17 @@ class PlaceList(Resource):
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
-        """
-        Retrieve the list of all locations.
-
-        Retrieves all locations via the facade and returns a simplified list
-        containing the ID, title, latitude, and longitude of each location.
-
-        Returns:
-        tuple: A list of dictionaries representing each location and
-        the HTTP 200 code.
-        """
+        """Retrieve a list of all places"""
         places = facade.get_all_places()
-        List_places = []
+        list_places = []
         for place in places:
-            List_places.append({
+            list_places.append({
                 'id': place.id,
                 'title': place.title,
                 'latitude': place.latitude,
                 'longitude': place.longitude
             })
-        return List_places, 200
+        return list_places, 200
 
 
 @api.route('/<place_id>')
@@ -133,19 +95,7 @@ class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
-        """
-        Retrieve details of a place by its ID.
-
-        Retrieves a specific place via its ID. If the place does not exist,
-        returns a 404 error with an appropriate message.
-
-        Args:
-        place_id (str): The unique identifier of the place to retrieve.
-
-        Returns:
-        tuple: A dictionary containing detailed information
-        about the place and HTTP code 200 if found, or an error message
-        with code 404 if not found."""
+        """Get place details by ID"""
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
@@ -176,31 +126,15 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
-        """
-        Update place information.
-
-        Accepts JSON data from the request and attempts to update
-        an existing place identified by place_id. If the data is invalid,
-        returns a 400 response. If the place does not exist, returns a 404 response.
-
-        Args:
-        place_id (str): The unique identifier of the place to update.
-
-        Returns:
-        tuple: A dictionary containing the updated information
-        for the place and HTTP code 200 if successful, or an error message
-        with code 400 or 404 if unsuccessful.
-        """
+        """Update a place's information"""
         place_data = api.payload
-
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
         try:
             update_place = facade.update_place(place_id, place_data)
         except ValueError as error:
             return {'error': str(error)}, 400
-
-        if not update_place:
-            return {'error': 'Place not found'}, 404
-
         return {
             'id': update_place.id,
             'title': update_place.title,
@@ -211,3 +145,48 @@ class PlaceResource(Resource):
             'owner_id': update_place.owner.id
         }, 200
 
+@api.route('/<place_id>/amenities')
+class PlaceAmenities(Resource):
+    @api.expect(amenity_model)
+    @api.response(200, 'Amenities added successfully')
+    @api.response(404, 'Place not found')
+    @api.response(400, 'Invalid input data')
+    def post(self, place_id):
+        amenities_data = api.payload
+        if not amenities_data or len(amenities_data) == 0:
+            return {'error': 'Invalid input data'}, 400
+        
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+        
+        for amenity in amenities_data:
+            a = facade.get_amenity(amenity['id'])
+            if not amenity:
+                return {'error': 'Invalid input data'}, 400
+        
+        for amenity in amenities_data:
+            place.add_amenity(a)
+        return {'message': 'Amenities added successfully'}, 200
+
+@api.route('/<place_id>/reviews/')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+        reviews = place.reviews
+
+        return [
+            {
+                'id': review.id,
+                'text': review.text,
+                'rating': review.rating,
+                'place_id': review.place.id,
+                'user_id': review.user.id
+            }
+            for review in reviews
+        ], 200

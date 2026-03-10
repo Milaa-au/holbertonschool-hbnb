@@ -14,57 +14,28 @@ class HBnBFacade:
         direct access to the repositories.
     """
     def __init__(self):
-        self.user_repository = SQLAlchemyRepository(User)
-        self.place_repository = SQLAlchemyRepository(Place)
-        self.review_repository = SQLAlchemyRepository(Review)
-        self.amenity_repository = SQLAlchemyRepository(Amenity)
+        self.user_repo = InMemoryRepository()
+        self.place_repo = InMemoryRepository()
+        self.review_repo = InMemoryRepository()
+        self.amenity_repo = InMemoryRepository()
 
+    # USER
     def create_user(self, user_data):
-        """
-        Creates a new user.
-
-        Args:
-        user_data (dict): Dictionary containing user information.
-
-        Returns:
-        User: The created user object.
-        """
+        """create_user that create user"""
         user = User(**user_data)
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
-        """
-        Retrieves a user by their ID.
-
-        Args:
-        user_id (str): User ID.
-
-        Returns:
-        User: The corresponding user object or None if not found.
-        """
+        """get_user that retrieved an user"""
         return self.user_repo.get(user_id)
 
     def get_all_users(self):
-        """
-        Retrieves all users.
-
-        Returns:
-        list: List of all user objects.
-        """
+        """get_all_users that retrieved all users"""
         return self.user_repo.get_all()
 
     def update_user(self, user_id, user_data):
-        """
-        Updates the information for an existing user.
-
-        Args:
-        user_id (str): ID of the user to update.
-        user_data (dict): Dictionary of fields to update.
-
-        Returns:
-        User: The updated user object, or None if the user does not exist.
-        """
+        """update_user that update an user"""
         user = self.get_user(user_id)
         if not user:
             return None
@@ -72,30 +43,13 @@ class HBnBFacade:
         return self.get_user(user_id)
 
     def get_user_by_email(self, email):
-        """
-        Retrieves a user from their email address.
-
-        Args:
-        email (str): The user's email address.
-
-        Returns:
-        User: The corresponding user object or None if not found.
-        """
+        """get_user_by_email that retrieved an user via an email"""
         return self.user_repo.get_by_attribute('email', email)
 
+    # PLACE
     def create_place(self, place_data):
-        """
-        Creates a new place with validation of required fields.
+        """Create a new place with validation"""
 
-        Args:
-        place_data (dict): Dictionary containing the place information.
-
-        Raises:
-        ValueError: If a required field is missing or invalid.
-
-        Returns:
-        Place: The created place object.
-        """
         try:
             owner_id = place_data["owner_id"]
             title = place_data["title"]
@@ -130,62 +84,21 @@ class HBnBFacade:
         return place
 
     def get_place(self, place_id):
-        """
-            Retrieves a place by its identifier.
-
-        Args:
-        place_id (str): Identifier of the place.
-
-        Returns:
-        Place: The corresponding place object or None if not found.
-        """
+        """get_place that retrieved place"""
         return self.place_repo.get(place_id)
 
     def get_all_places(self):
-        """
-        Retrieves all existing locations.
-
-        Returns:
-        list: List of all location objects.
-        """
+        """get_all_places that retrieved all places"""
         return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        """
-        Updates an existing place with validation of modified fields.
-
-        Args:
-        place_id (str): ID of the place to be updated.
-        place_data (dict): Dictionary containing the fields to be updated.
-
-        Raises:
-        ValueError: If a value is invalid (price <= 0, 
-        latitude/longitude out of bounds, invalid title).
-
-        Returns:
-        Place: The updated place object or None if the place does not exist.
-        """
+        """update_place that update a place"""
         place = self.get_place(place_id)
         if not place:
             return None
 
         place_data.pop("owner_id", None)
         place_data.pop("amenities", None)
-
-        if "price" in place_data and place_data["price"] <= 0:
-            raise ValueError("Price must be greater than 0")
-
-        if "latitude" in place_data:
-            if place_data["latitude"] < -90 or place_data["latitude"] > 90:
-                raise ValueError("Latitude must be between -90 and 90")
-
-        if "longitude" in place_data:
-            if place_data["longitude"] < -180 or place_data["longitude"] > 180:
-                raise ValueError("Longitude must be between -180 and 180")
-
-        if "title" in place_data:
-            if not place_data["title"] or len(place_data["title"]) > 100:
-                raise ValueError("Invalid title")
 
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
@@ -216,6 +129,7 @@ class HBnBFacade:
         self.amenity_repo.add(amenity)
         return amenity
 
+    # AMENITY
     def get_amenity(self, amenity_id):
 
         """
@@ -250,6 +164,7 @@ class HBnBFacade:
         self.amenity_repo.update(amenity_id, amenity_data)
         return self.get_amenity(amenity_id)
 
+    # REVIEW
     def create_review(self, review_data):
         """
         Create a new review after validating the data.
@@ -273,10 +188,16 @@ class HBnBFacade:
         user = self.user_repo.get(review_data['user_id'])
         if not user:
             raise KeyError('Invalid input data')
-        
+
+        del review_data['user_id']
+        review_data['user'] = user
+
         place = self.place_repo.get(review_data['place_id'])
         if not place:
             raise KeyError('Invalid input data')
+
+        del review_data['place_id']
+        review_data['place'] = place
 
         review = Review(**review_data)
         self.review_repo.add(review)
