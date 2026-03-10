@@ -18,7 +18,26 @@ class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
+        data = api.payload
+        current_user = get_jwt_identity()
+
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"error": "Place not found"}, 404
+
+        if place.owner_id == current_user:
+            return {"error": "You cannot review your own place"}, 400
+        reviews = facade.get_reviews_by_place(data["place_id"])
+
+        for review in reviews:
+            if review.user.id == current_user:
+                return {"error": "You have already reviewed this place"}, 400
+
+        data["user_id"] = current_user
+
         try:
             data = request.json
             review_obj = facade.create_review(data)
@@ -67,9 +86,15 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    
     def put(self, review_id):
         data = api.payload
+        current_user = get_jwt_identity()
+
         review = facade.get_review(review_id)
+
+        if review.user.id != current_user:
+            return {"error": "Unauthorized action"}, 403
 
         if not review:
             return {'error': 'Review not found'}, 404
@@ -86,8 +111,14 @@ class ReviewResource(Resource):
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
-
+    @jwt_required()
     def delete(self, review_id):
+        current_user = get_jwt_identity()
+
+        review = facade.get_review(review_id)
+
+        if review.user.id != current_user:
+            return {"error": "Unauthorized action"}, 403
         delete_review = facade.get_review(review_id)
         if not delete_review:
             return {'error': 'Review not found'}, 404

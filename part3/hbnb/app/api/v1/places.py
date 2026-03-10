@@ -8,6 +8,7 @@ service layer to handle business logic and data persistence.
 
 
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -57,9 +58,14 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new place"""
         place_data = api.payload
+
+        current_user = get_jwt_identity()
+
+        place_data["owner_id"] = current_user
 
         try:
             new_place = facade.create_place(place_data)
@@ -97,6 +103,7 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         place = facade.get_place(place_id)
+
         if not place:
             return {'error': 'Place not found'}, 404
         return {
@@ -128,7 +135,13 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+        current_user = get_jwt_identity()
+
         place = facade.get_place(place_id)
+
+        if place.owner_id != current_user:
+            return {"error": "Unauthorized action"}, 403
+
         if not place:
             return {'error': 'Place not found'}, 404
         try:
