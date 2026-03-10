@@ -75,6 +75,11 @@ Represents a feature of a property.
 E.g: Wi-Fi, Parking.
 Can be associated with several Places.
 
+**Auth:**
+
+Represents The connection point 
+will authenticate the user.
+
 ---
 ## **Models and Relationships:**
 **1. User (1) ────< Place (N):**
