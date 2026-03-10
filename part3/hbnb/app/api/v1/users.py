@@ -8,6 +8,7 @@ service layer to handle business logic and data persistence.
 
 
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -115,6 +116,7 @@ class UserResource(Resource):
     @api.expect(user_model, validate=True)
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
+    @jwt_required()
     def put(self, user_id):
         """
         Update an existing user.
@@ -129,10 +131,17 @@ class UserResource(Resource):
             tuple: Updated user data if successful, otherwise an error message.
         """
         data_user = api.payload
+        current_user = get_jwt_identity()
 
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+
+        if user_id != current_user:
+            return {"error": "Unauthorized action"}, 403
+
+        if "email" in data_user or "password" in data:
+            return {"error": "You cannot modify email or password"}, 400
 
         try:
             update_user = facade.update_user(user_id, data_user)

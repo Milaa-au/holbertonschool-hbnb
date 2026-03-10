@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
@@ -23,12 +24,12 @@ class ReviewList(Resource):
         data = api.payload
         current_user = get_jwt_identity()
 
-        place = facade.get_place(place_id)
+        place = facade.get_place(data["place_id"])
 
         if not place:
             return {"error": "Place not found"}, 404
 
-        if place.owner_id == current_user:
+        if place.owner.id == current_user:
             return {"error": "You cannot review your own place"}, 400
         reviews = facade.get_reviews_by_place(data["place_id"])
 
@@ -39,7 +40,6 @@ class ReviewList(Resource):
         data["user_id"] = current_user
 
         try:
-            data = request.json
             review_obj = facade.create_review(data)
             return {
                 "id": str(review_obj.id),
@@ -86,18 +86,18 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
-    
+    @jwt_required()
     def put(self, review_id):
         data = api.payload
         current_user = get_jwt_identity()
 
         review = facade.get_review(review_id)
 
-        if review.user.id != current_user:
-            return {"error": "Unauthorized action"}, 403
-
         if not review:
             return {'error': 'Review not found'}, 404
+
+        if review.user.id != current_user:
+            return {"error": "Unauthorized action"}, 403
         updated_review = facade.update_review(review_id, data)
 
         if not updated_review:
