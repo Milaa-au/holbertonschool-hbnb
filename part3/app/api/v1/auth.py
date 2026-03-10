@@ -19,12 +19,9 @@ class Login(Resource):
         credentials = api.payload
         
         user = facade.get_user_by_email(credentials['email'])
-                if not user or not user.verify_password(credentials['password']):
+        if not user or not user.verify_password(credentials['password']):
             return {'error': 'Invalid credentials'}, 401
-        access_token = create_access_token(
-        identity=str(user.id),
-        additional_claims={"is_admin": user.is_admin}
-        )
+        access_token = create_access_token(identity=str(user.id), additional_claims={"is_admin": user.is_admin})
         return {'access_token': access_token}, 200
 
 @api.route('/protected')
@@ -35,4 +32,4 @@ class ProtectedResource(Resource):
          print("jwt------")
          print(get_jwt_identity())
          current_user = get_jwt_identity()
-         return {'message': f'Hello, user {current_user}'}, 200
+         return {'message': f'Hello, user {current_user}, {current_user["is_admin"]}'}, 200
