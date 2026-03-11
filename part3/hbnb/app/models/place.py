@@ -9,10 +9,13 @@ ownership, and relationships with reviews and amenities.
 
 
 from app.models.base_model import BaseModel
-from app.models.user import User
-from app.models.amenity import Amenity
 from app import db
 from sqlalchemy.orm import validates
+
+# Freeze blocks while waiting for task 9
+
+#from app.models.user import User
+#from app.models.amenity import Amenity
 
 
 class Place(BaseModel):
@@ -66,8 +69,7 @@ class Place(BaseModel):
         return value
 
 # Freeze blocks while waiting for task 9
-
-    
+ 
 #    @property
 #   def owner(self):
 #        return self.__owner

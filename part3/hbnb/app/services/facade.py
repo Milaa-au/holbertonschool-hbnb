@@ -2,6 +2,9 @@
 the persistance layer.
 """
 from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.repositories.place_repository import PlaceRepository
+from app.persistence.repositories.review_repository import ReviewRepository
+from app.persistence.repositories.amenity_repository import AmenityRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
@@ -15,9 +18,9 @@ class HBnBFacade:
     """
     def __init__(self):
         self.user_repo = SQLAlchemyRepository(User)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = AmenityRepository()
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
 
     # USER
     def create_user(self, user_data):

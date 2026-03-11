@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
 from app.models.base_model import BaseModel
+from app import db
+from sqlalchemy.orm import validates
+
 
 class Amenity(BaseModel):
     """
@@ -15,31 +18,12 @@ class Amenity(BaseModel):
     It ensures the name does not exceed 50 characters.
     It raises a ValueError if validation fails.
     """
+    __tablename__ = 'amenities'
 
-    def __init__(self, name):
-        """
-        This constructor initializes a new Amenity instance.
-        It first calls the parent class constructor (BaseModel) 
-        to initialize common attributes such as the unique 
-        identifier and timestamps.
-        Then, it validates the name parameter:
-        It ensures that a name is provided. 
-        If the name is missing or empty, a ValueError is raised.
-        It checks that the name does not exceed 50 characters. 
-        If it does, a ValueError is raised.
-        If all validations pass, the name attribute is assigned to the instance.
-        This guarantees that every Amenity object is created 
-        with valid and consistent data.
-        """
-        super().__init__()
-        self.name = name
+    name = db.Column(db.String(50), nullable=False)
 
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, value):
+    @validates('name')
+    def validate_name(self, key, value):
         if not isinstance(value, str):
             raise TypeError("Name must be a string")
 
@@ -48,7 +32,4 @@ class Amenity(BaseModel):
 
         if len(value) > 50:
             raise ValueError("Name must be 50 characters or less")
-        self.__name = value
-
-    def update(self, data):
-        return super().update(data)
+        return value

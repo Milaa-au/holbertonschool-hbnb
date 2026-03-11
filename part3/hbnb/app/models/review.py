@@ -1,8 +1,14 @@
 #!/usr/bin/python3
 
 from app.models.base_model import BaseModel
-from app.models.user import User
-from app.models.place import Place
+from app import db
+from sqlalchemy.orm import validates
+
+# Freeze blocks while waiting for task 9
+
+#from app.models.user import User
+#from app.models.place import Place
+
 
 class Review(BaseModel):
     """
@@ -15,65 +21,39 @@ class Review(BaseModel):
         user (User): User who wrote the review
     """
 
-    def __init__(self, text, rating, place, user):
-        """
-        Initializes a new instance of Review.
+    __tablename__ = 'reviews'
 
-        Args:
-            text (str): Text of the comment
-            rating (int): Rating from 1 to 5
-            place (Place): Associated location
-            user (User): Author of the review
+    text = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, db.CheckConstraint('rating >= 1 AND rating <= 5'), nullable=False)
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
-        Raises:
-            ValueError: if validations fail
-        """
-        super().__init__()
-        self.text = text
-        self.rating = rating
-        self.place = place
-        self.user = user
-
-    @property
-    def text(self):
-        return self.__text
-
-    @text.setter
-    def text(self, value):
+    @validates('text')
+    def validate_text(self, key, value):
         if not value:
             raise ValueError("text is required")
         if not isinstance(value, str):
             raise TypeError("Text must be a string")
-        self.__text = value
+        return value
 
-    @property
-    def rating(self):
-        return self.__rating
-
-    @rating.setter
-    def rating(self, value):
+    @validates('rating')
+    def validate_rating(self, key, value):
         if not isinstance(value, int):
             raise ValueError("Rating must be an integer")
         if value < 1 or value > 5:
             raise ValueError("Rating must be between 1 and 5")
-        self.__rating = value
+        return value
 
-    @property
-    def place(self):
-        return self.__place
+# Freeze blocks while waiting for task 9
 
-    @place.setter
-    def place(self, value):
-        if not isinstance(value, Place):
-            raise ValueError("place must be a Place instance")
-        self.__place = value
+#    @validates('place')
+#    def validate_place(self, key, value):
+#        if not isinstance(value, Place):
+#            raise ValueError("place must be a Place instance")
+#        return value
 
-    @property
-    def user(self):
-        return self.__use
-
-    @user.setter
-    def user(self, value):
-        if not isinstance(value, User):
-            raise ValueError("user must be a User instance")
-        self.__user = value
+#    @validates('user')
+#    def validate_user(self, key, value):
+#        if not isinstance(value, User):
+#            raise ValueError("user must be a User instance")
+#        return value
