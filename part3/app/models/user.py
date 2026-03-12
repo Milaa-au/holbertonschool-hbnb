@@ -26,7 +26,6 @@ class User(BaseModel):
             raise ValueError("First name is required")
         if len(value) > 50:
             raise ValueError("First name must be 50 characters or less")
-        self.__first_name = value
         return value
 
     @validates('last_name')
@@ -35,7 +34,6 @@ class User(BaseModel):
             raise ValueError("Last name is required")
         if len(value) > 50:
             raise ValueError("Last name must be 50 characters or less")
-        self.__last_name = value
         return value
     
     @validates('email')
@@ -46,15 +44,12 @@ class User(BaseModel):
 
         if not re.match(pattern, value):
             raise ValueError("Invalid email format")
-
-        self.__email = value
         return value
 
     @validates('is_admin')
     def validate_is_admin(self, key, value):
         if not isinstance(value, bool):
             raise TypeError("Is Admin must be a boolean")
-        self.__is_admin = value
         return value
 
     def add_place(self, place):
