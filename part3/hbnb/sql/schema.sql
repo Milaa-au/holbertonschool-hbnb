@@ -25,12 +25,12 @@ CREATE TABLE IF NOT EXISTS Place (
 CREATE TABLE IF NOT EXISTS Review (
     id CHAR(36) PRIMARY KEY,
     text TEXT NOT NULL,
-    rating INT CHECK(rating >= 1 AND rating <= 5) NOT NULL,
+    rating INT NOT NULL CHECK(rating >= 1 AND rating <= 5),
     user_id CHAR(36) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id),
     place_id CHAR(36) NOT NULL,
-    FOREIGN KEY (place_id) REFERENCES Place(id),
-    UNIQUE(user_id, place_id)
+    UNIQUE(user_id, place_id),
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (place_id) REFERENCES Place(id)
 );
 -- Script that creates the tables Amenity
 -- Create Amenity if it does not already exist
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS Amenity (
 -- Create Place_Amenity if it does not already exist
 CREATE TABLE IF NOT EXISTS Place_Amenity (
     place_id CHAR(36) NOT NULL,
-    FOREIGN KEY (place_id) REFERENCES Place(id),
     amenity_id CHAR(36) NOT NULL,
-    FOREIGN KEY (amenity_id) REFERENCES Amenity(id),
-    PRIMARY KEY (place_id, amenity_id)
+    PRIMARY KEY (place_id, amenity_id),
+    FOREIGN KEY (place_id) REFERENCES Place(id),
+    FOREIGN KEY (amenity_id) REFERENCES Amenity(id)
 );
 -- Script that insert a new rows in the table User
 -- Insert administrator user
