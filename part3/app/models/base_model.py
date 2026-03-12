@@ -1,24 +1,15 @@
 #!/usr/bin/python3
-"""
-Base model.
-
-This module defines the BaseModel class, which provides common
-attributes and behavior shared by all domain models such as
-unique identification and timestamp management.
-"""
-
+from app import db
 import uuid
 from datetime import datetime
 
+class BaseModel(db.Model):
+    __abstract__ = True
 
-class BaseModel:
-    """
-    Base class for all models.
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    Provides a unique identifier and timestamps for creation
-    and last update. Also includes helper methods to update
-    and persist state changes.
-    """
     def __init__(self):
         """
         Initialize a new BaseModel instance.
