@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Place (
     price DECIMAL(10, 2) NOT NULL,
     latitude FLOAT NOT NULL,
     longitude FLOAT NOT NULL,
-    owner_id CHAR(36),
+    owner_id CHAR(36) NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES User(id)
 );
 -- Script that creates the tables Review
@@ -47,3 +47,19 @@ CREATE TABLE IF NOT EXISTS Place_Amenity (
     FOREIGN KEY (amenity_id) REFERENCES Amenity(id),
     PRIMARY KEY (place_id, amenity_id)
 );
+-- Script that insert a new rows in the table User
+-- Insert administrator user
+INSERT INTO User (id, first_name, last_name, email, password, is_admin) VALUES (
+    '36c9050e-ddd3-4c3b-9731-9f487208bbc1',
+    'Admin',
+    'HBnB',
+    'admin@hbnb.io',
+    '$2b$12$/p5I36NWwepUBXlpeW.hPuTh67aNdtGXm.m10Bk0VEjCmg2sRaWWW',
+    True
+);
+-- Script that insert a new rows in the table Amenity
+-- Insert initial amenities into the Amenity table
+INSERT INTO Amenity (id, name) VALUES
+('3914cd05-b04e-4b7f-8c5f-c85b8af97ab8', 'WiFi'),
+('478ede07-f435-40da-a18c-b633a3947f45', 'Swimming Pool'),
+('8d959aaa-fa14-4276-b3a9-83a62d12c828', 'Air Conditioning');
