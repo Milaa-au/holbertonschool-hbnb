@@ -63,8 +63,12 @@ class AdminAmenityCreate(Resource):
         if not current_user.get('is_admin'):
             return {'error': 'Admin privileges required'}, 403
 
-        # Logic to create a new amenity
-        pass
+        amenity_data = api.payload
+        try:
+            new_amenity = facade.create_amenity(amenity_data)
+            return {'id': new_amenity.id, 'name': new_amenity.name}, 201
+        except ValueError as i:
+            return {'message': str(i)}, 400
 
 @api.route('/amenities/<amenity_id>')
 class AdminAmenityModify(Resource):
@@ -74,5 +78,15 @@ class AdminAmenityModify(Resource):
         if not current_user.get('is_admin'):
             return {'error': 'Admin privileges required'}, 403
 
-        # Logic to update an amenity
-        pass
+        amenity_data = api.payload
+        try:
+            updated_amenity = facade.update_amenity(
+                amenity_id, amenity_data)
+            if not updated_amenity:
+                return {'error': 'Amenity not found'}, 404
+            return {
+                'id': updated_amenity.id,
+                'name': updated_amenity.name
+            }, 200
+        except ValueError as i:
+            return {'message': str(i)}, 400
