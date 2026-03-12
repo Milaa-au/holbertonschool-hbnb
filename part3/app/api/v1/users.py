@@ -161,8 +161,17 @@ class AdminUserCreate(Resource):
         if facade.get_user_by_email(email):
             return {'error': 'Email already registered'}, 400
 
-        # Logic to create a new user
-        pass
+        try:
+            new_user = facade.create_user(user_data)
+        except ValueError as error:
+            return {'error': str(error)}, 400
+
+        return {
+            'id': new_user.id,
+            'first_name': new_user.first_name,
+            'last_name': new_user.last_name,
+            'email': new_user.email
+        }, 201
 
 @api.route('/users/<user_id>')
 class AdminUserModify(Resource):
@@ -175,11 +184,23 @@ class AdminUserModify(Resource):
         data = request.json
         email = data.get('email')
 
-        # Ensure email uniqueness
         if email:
             existing_user = facade.get_user_by_email(email)
             if existing_user and existing_user.id != user_id:
                 return {'error': 'Email already in use'}, 400
 
-        # Logic to update user details
-        pass
+        update_user = facade.update_user(user_id, data_user)
+        if not update_user:
+            return {'error': 'User not found'}, 404
+
+        try:
+            update_user = facade.update_user(user_id, data_user)
+        except ValueError as error:
+            return {"error": str(error)}, 400
+
+        return {
+            'id': update_user.id,
+            'first_name': update_user.first_name,
+            'last_name': update_user.last_name,
+            'email': update_user.email
+        }, 200
