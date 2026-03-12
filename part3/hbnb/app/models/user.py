@@ -7,8 +7,8 @@ represents an application user with validation rules for core fields.
 """
 
 
-from app.models.base_model import BaseModel
 from app import bcrypt
+from app.models.base_model import BaseModel
 from app import db
 from sqlalchemy.orm import validates
 import re
