@@ -205,5 +205,19 @@ class AdminPlaceModify(Resource):
         if not is_admin and place.owner_id != user_id:
             return {'error': 'Unauthorized action'}, 403
 
-        # Logic to update the place
-        pass
+        place_data = api.payload
+        if not place:
+            return {'error': 'Place not found'}, 404
+        try:
+            update_place = facade.update_place(place_id, place_data)
+        except ValueError as error:
+            return {'error': str(error)}, 400
+        return {
+            'id': update_place.id,
+            'title': update_place.title,
+            'description': update_place.description,
+            'price': update_place.price,
+            'latitude': update_place.latitude,
+            'longitude': update_place.longitude,
+            'owner_id': update_place.owner.id
+        }, 200
