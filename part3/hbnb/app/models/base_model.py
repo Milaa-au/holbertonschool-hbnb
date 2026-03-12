@@ -7,11 +7,12 @@ attributes and behavior shared by all domain models such as
 unique identification and timestamp management.
 """
 
+from app import db
 import uuid
 from datetime import datetime
 
 
-class BaseModel:
+class BaseModel(db.Model):
     """
     Base class for all models.
 
@@ -19,16 +20,11 @@ class BaseModel:
     and last update. Also includes helper methods to update
     and persist state changes.
     """
-    def __init__(self):
-        """
-        Initialize a new BaseModel instance.
+    __abstract__ = True
 
-        Generates a unique UUID and sets creation and update
-        timestamps to the current datetime.
-        """
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def save(self):
         """
