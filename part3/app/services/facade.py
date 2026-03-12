@@ -1,34 +1,34 @@
 """Facade is an intermediary between the API layer and
 the persistance layer.
 """
-from app.persistence.repository import InMemoryRepository
+from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.repositories.place_repository import PlaceRepository
+from app.persistence.repositories.review_repository import ReviewRepository
+from app.persistence.repositories.amenity_repository import AmenityRepository
+from app.persistence.repositories.user_repository import UserRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
 from app.models.review import Review
 
-
 class HBnBFacade:
-    """HBnBFacade acts as an intermediary between the API layer and the
-        persistence layer. It centralizes business logic and abstracts
-        direct access to the repositories.
-    """
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = UserRepository()
+        self.amenity_repo = AmenityRepository()
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
 
-    # USER
     def create_user(self, user_data):
-        """create_user that create user"""
         user = User(**user_data)
+        user.hash_password(user_data['password'])
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
-        """get_user that retrieved an user"""
         return self.user_repo.get(user_id)
+
+    def get_user_by_email(self, email):
+        return self.user_repo.get_user_by_email(email)
 
     def get_all_users(self):
         """get_all_users that retrieved all users"""
