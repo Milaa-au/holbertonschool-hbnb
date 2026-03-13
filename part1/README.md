@@ -160,9 +160,7 @@ part1
 
 # 👨‍💻 Authors
 
-**Pawnee DEFIZE**
-https://github.com/Pawnee33
-
-**Milaa-au**
+* Mila AUDU: https://github.com/Milaa-au
+* Pawnee DEFIZE: https://github.com/Pawnee33
 
 Holberton School – Bordeaux
