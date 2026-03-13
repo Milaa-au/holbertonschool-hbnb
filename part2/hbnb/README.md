@@ -7,7 +7,84 @@ Creating the necessary folders, packages, and files.
 Initialization of the Facade pattern for communication between layers. Implementation of in-memory storage to manage the storage and validation of objects.
 
 ---
+## **Architecture Overview**
 
+The backend follows a **layered architecture** designed to ensure modularity, maintainability, and scalability.
+```
+    Client
+       │
+       ▼
+   API Layer
+ (Flask RESTX)
+       │
+       ▼
+     Facade
+       │
+       ▼
+ Business Logic
+     (Models)
+       │
+       ▼
+   Persistence
+   (Repository)
+```
+
+### Explanation
+
+* **API Layer**  
+Handles HTTP requests and responses using Flask-RESTX.
+
+* **Facade Layer**  
+Acts as an intermediary between the API layer and the business logic layer.
+
+* **Business Logic Layer (Models)**  
+Contains the main entities of the system such as `User`, `Place`, `Review`, and `Amenity`.
+
+* **Persistence Layer (Repository)**  
+Handles data storage and retrieval using an in-memory repository.
+---
+## **Project Structure**
+
+The project is organized to separate responsibilities between layers.
+```
+hbnb/
+│
+├── app/
+│   ├── api/
+│   │   └── v1/
+│   │       ├── users.py
+│   │       ├── places.py
+│   │       ├── reviews.py
+│   │       └── amenities.py
+│   │
+│   ├── models/
+│   │   ├── base_model.py
+│   │   ├── user.py
+│   │   ├── place.py
+│   │   ├── review.py
+│   │   └── amenity.py
+│   │
+│   ├── services/
+│   │   └── facade.py
+│   │
+│   └── persistence/
+│       └── repository.py
+│
+├── config.py
+├── run.py
+├── requirements.txt
+└── unittests/
+```
+
+### Directory Description
+
+* **app/api/** → REST API endpoints  
+* **app/models/** → Business entities  
+* **app/services/** → Facade pattern implementation  
+* **app/persistence/** → Repository and data storage logic  
+* **unittests/** → Automated unit tests
+
+---
 ## **Structure Directory and file:**
 
 ### Directory:
