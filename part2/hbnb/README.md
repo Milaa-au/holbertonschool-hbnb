@@ -2,9 +2,9 @@
 
 ## **Description:**
 This part of the HBnB project focuses on setting up a modular and scalable architecture.
-Configuring the layer structure Presentation, business logic, and persistence of the Hbnb project.
+Configuring the layered structure of the Presentation, business logic, and persistence of the Hbnb project.
 Creating the necessary folders, packages, and files.
-Initialization of the facade pattern for communication between layers. Implementation of in-memory storage to manage the storage and validation of objects.
+Initialization of the Facade pattern for communication between layers. Implementation of in-memory storage to manage the storage and validation of objects.
 
 ---
 
@@ -55,15 +55,15 @@ Avoids code duplication.(DRY, "Don't Repeat Yourself")
 Represents a user of the system.
 Validates the data format.
 email uniqueness handled by the Facade.
-can own multple Places.
+can own multiple Places.
 Can write multiple Reviews.
 * **Review:**
 
-Represents an available property.
+Represents a review of a Place.
 Validates geographical coordinates.
 Ensures that the owner is a valid user.
 May contain multiple reviews.
-May be associeted with multiple amenities.
+May be associated with multiple amenities.
 * **Place:**
 
 Represents a review of a Place.
@@ -72,7 +72,7 @@ Guarantee a valid rating (1-5).
 * **Amenity:**
 
 Represents a feature of a property.
-E.g: Wi-Fi, Parking.
+e.g: Wi-Fi, Parking.
 Can be associated with several Places.
 
 ---
@@ -108,7 +108,7 @@ It exposes RESTful endpoints using Flask-RESTX and handles:
 * Status codes (200, 201, 400, 404).
 * Error handling.
 
-The API does not contain business logic.
+The API layer does not contain any business logic.
 
 It communicates with the Business Logic layer exclusively through the Facade.
 
@@ -150,7 +150,7 @@ This abstraction allows the storage mechanism to be replaced later (e.g., databa
 * Reusability.
 * Clean separation between logic and persistence.
 ---
-## **Unit test:**
+## **Unit Tests:**
 ### Description:
 The project includes automated unit tests to ensure the reliability, stability, and correctness of each layer of the application.
 
