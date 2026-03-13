@@ -2,12 +2,12 @@
 
 This repository contains **Part 1 of the HBnB project**, developed as part of the **Holberton School Full Stack Software Engineering program**.
 
-This first stage focuses on **system design and architecture**, before implementing the application.
+This stage focuses on **system design and architecture**, before implementing the backend.
 
-The goal of the project is to design a platform similar to **Airbnb**, allowing users to:
+The goal is to design a platform similar to **Airbnb**, allowing users to:
 
 * create an account
-* list places for rent
+* list places
 * browse available places
 * leave reviews
 * manage amenities
@@ -16,21 +16,21 @@ The goal of the project is to design a platform similar to **Airbnb**, allowing 
 
 # 🎯 Project Objectives
 
-The main goal of this part is to understand how to **design a complex backend application before coding it**.
+The purpose of this phase is to understand how to **design a complex backend system before coding it**.
 
-Key learning objectives include:
+Key objectives include:
 
 * analyzing application requirements
-* designing system architecture
+* designing a scalable architecture
 * modeling entities and relationships
 * creating UML diagrams
-* documenting API interactions
+* documenting system interactions
 
 ---
 
 # 🏗 System Architecture
 
-The HBnB platform is structured around several core entities.
+The application is built around four main entities.
 
 ### 👤 User
 
@@ -46,15 +46,15 @@ Responsibilities:
 
 ### 🏠 Place
 
-Represents a property available for rent.
+Represents a property available for booking.
 
-Each place includes:
+Each place contains:
 
-* an owner
+* owner
 * description
-* price
 * location
-* associated amenities
+* price
+* amenities
 
 ---
 
@@ -64,83 +64,71 @@ Allows users to leave feedback on a place.
 
 A review contains:
 
-* a rating
-* a comment
-* the author
-* the associated place
+* rating
+* comment
+* author
+* associated place
 
 ---
 
 ### 🛠 Amenity
 
-Represents an amenity available in a place.
+Represents features available in a place.
 
 Examples include:
 
 * Wi-Fi
 * swimming pool
-* air conditioning
 * parking
+* air conditioning
 
 ---
 
-# 📊 Diagrams Included
-
-This folder contains several diagrams used to design the system architecture.
-
----
+# 📊 System Diagrams
 
 ## Class Diagram
 
-Defines the relationships between the main entities of the system:
+This diagram represents the **relationships between the main entities** of the system.
 
-* User
-* Place
-* Review
-* Amenity
-
-File:
-
-Class Diagram.png
-
----
-
-## Sequence Diagrams
-
-These diagrams illustrate how different components interact during API calls.
-
-### Account Creation
-
-Describes the process of creating a new user account.
-
-### Request List
-
-Shows how the system retrieves available places.
-
-### Place List
-
-Displays the flow for listing places.
-
-### Submit Review
-
-Illustrates how a user submits a review.
-
-Files:
-
-* Sequence-Diagrams_for_API Calls_Account.jpg
-* Sequence-Diagrams_for_API Calls_RequestList.jpg
-* Sequence-Diagrams_for_API Calls_PlaceList.jpg
-* Sequence-Diagrams_for_API Calls_SubmitReview.jpg
+part1/Class Diagram.png
 
 ---
 
 ## Package Diagram
 
-The package diagram shows the **overall structure of the project** and how the modules are organized.
+This diagram shows the **overall architecture of the application and module organization**.
 
-File:
+part1/UML-PackageDiagram.jpg
 
-UML-PackageDiagram.jpg
+---
+
+# 🔄 Sequence Diagrams
+
+These diagrams illustrate how the system components interact during API calls.
+
+---
+
+### Account Creation
+
+part1/Sequence-Diagrams_for_API Calls_Account.jpg
+
+---
+
+### Request List
+
+part1/Sequence-Diagrams_for_API Calls_Criteria_RequestList.jpg
+
+---
+
+### Place List
+
+part1/Sequence-Diagrams_for_API Calls_PlaceList.jpg
+
+---
+
+### Submit Review
+
+part1/Sequence-Diagrams_for_API Calls_SubmitReview.jpg
 
 ---
 
@@ -172,25 +160,9 @@ part1
 
 # 👨‍💻 Authors
 
-Project developed by:
-
 **Pawnee DEFIZE**
-GitHub: https://github.com/Pawnee33
+https://github.com/Pawnee33
 
 **Milaa-au**
 
-As part of the **Holberton School Bordeaux program**.
-
----
-
-# 📚 Context
-
-This project represents the **design phase of the HBnB application**.
-
-Later stages of the project include:
-
-* backend implementation
-* REST API development
-* database integration
-* full platform development
-
+Holberton School – Bordeaux
