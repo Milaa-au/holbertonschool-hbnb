@@ -90,7 +90,7 @@ Examples include:
 
 This diagram represents the **relationships between the main entities** of the system.
 
-part1/Class Diagram.png
+![alt text](part1/Class_Diagram.png)
 
 ---
 
@@ -98,7 +98,7 @@ part1/Class Diagram.png
 
 This diagram shows the **overall architecture of the application and module organization**.
 
-part1/UML-PackageDiagram.jpg
+![alt text](part1/UML-PackageDiagram.jpg)
 
 ---
 
@@ -110,25 +110,25 @@ These diagrams illustrate how the system components interact during API calls.
 
 ### Account Creation
 
-part1/Sequence-Diagrams_for_API Calls_Account.jpg
+![alt text](part1/Sequence-Diagrams_for_API_Calls_Account.jpg)
 
 ---
 
 ### Request List
 
-part1/Sequence-Diagrams_for_API Calls_Criteria_RequestList.jpg
+![alt text](part1/Sequence-Diagrams_for_API_Calls_Criteria_RequestList.jpg)
 
 ---
 
 ### Place List
 
-part1/Sequence-Diagrams_for_API Calls_PlaceList.jpg
+![alt text](part1/Sequence-Diagrams_for_API_Calls_PlaceList.jpg)
 
 ---
 
 ### Submit Review
 
-part1/Sequence-Diagrams_for_API Calls_SubmitReview.jpg
+![alt text](part1/Sequence-Diagrams_for_API_Calls_SubmitReview.jpg)
 
 ---
 
