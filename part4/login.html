@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <header>
+        <div class="container headinner">
+            <a href="index.html" class="brand" aria-label="home">
+                <img src="images/logo.png" alt="HBnB logo" class="logo" />
+            </a>
+        </div>
+    </header>
     <main>
-        <form id="login-form">
+        <form id="login-form" class="login-form">
             <h2>Login</h2>
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -16,9 +23,12 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             
-            <button type="submit">Login</button>
+            <button type="submit" class="login-button">Login</button>
         </form>
     </main>
+    <footer>
+        <p>© 2026 HBnB Evolution. All Rights Reserved.</p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>

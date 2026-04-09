@@ -1,43 +1,195 @@
-/* 
-  This is a SAMPLE File to get you started. Follow the instructions on the project to complete the tasks. 
-  You'll probably need to override some of theese styles.
-*/
-
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }
 
 body {
-    background-color: #f4f4f4;
-    color: #333;
-    display: flex;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.4;
 }
 
 header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem;
+  background-color: orange;
+  color: #fff;
+  padding: 1.2rem;
 }
 
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 1rem;
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.link-login {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 1rem;
+  font-weight: 600;
+}
+
+.logo {
+  height: 40px;
+  display: block;
 }
 
 main {
-    padding: 2rem;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-login-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    max-width: 300px;
-    margin: 0 auto;
+#filter {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
 
+#places-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.place-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  width: 300px;
+  min-height: 180px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.details-button {
+  background-color: orange;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.login-button {
+  background-color: orange;
+  border: none;
+  padding: 0.6rem 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+}
+
+#place-details {
+  max-width: 850px;
+  margin: 1.5rem auto;
+  padding: 1.2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.place-info p {
+  margin-bottom: 0.6rem;
+}
+
+#reviews,
+#reviews-list {
+  max-width: 850px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.review-card {
+  background-color: #fff;
+  width: 100%;
+  max-width: 700px;
+  margin: 0.8rem auto;
+  padding: 1rem;
+  text-align: left;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+#add-review {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+form {
+  max-width: 500px;
+  margin: 1.2rem auto;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font: inherit;
+}
+
+#review-form button[type="submit"],
+form button[type="submit"] {
+  background-color: orange;
+  border: none;
+  padding: 0.6rem 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+}
+
+footer p {
+  background-color: orange;
+  color: white;
+  text-align: center;
+  padding: 5px;
+  margin-top: 2rem;
+}
+
+h2, .title {
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .place-card {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  nav {
+    padding: 0 1rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
 }
